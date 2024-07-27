@@ -24,8 +24,8 @@ const tableSlice = createSlice({
   initialState,
   reducers: {
     addTableRow: (state, action: PayloadAction<TableData>) => {
-      console.log('action.payload', action.payload)
-      console.log('state.tableData', state.tableData)
+      console.log('action.payload', action.payload);
+      console.log('state.tableData', state.tableData);
       state.tableData.push(action.payload);
     },
     deleteTableRow: (state, action: PayloadAction<number>) => {

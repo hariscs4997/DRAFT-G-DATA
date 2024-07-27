@@ -1,8 +1,7 @@
 /* eslint-disable consistent-return */
 import { useLoading } from '@/state/loading/hooks';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { api } from '@/config';
-import { SellData } from '@/state/sell';
 
 type DataField = {
   field_name: String;
@@ -19,17 +18,18 @@ export type TransformData = {
 
 export function usePortfolioStats() {
   const { isLoading, setIsLoading } = useLoading();
+  const [isLoadingConsent, setIsLoadingConsent] = useState(false);
 
   const getPortfolioStatsForConsent = useCallback(
-    async (name: any) => {
-      setIsLoading(true);
+    async (id: number) => {
+      setIsLoadingConsent(true);
       try {
-        const { data } = await api.get(`api/portfolio_stats/?consent_id=${name.id}`);
+        const { data } = await api.get(`api/portfolio_stats/?consent_id=${id}`);
         return data.data;
       } catch (error) {
         // console.error('Error fetching data:', error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingConsent(false);
       }
     },
     [setIsLoading],
@@ -54,9 +54,9 @@ export function usePortfolioStats() {
     return totalSum;
   }, []);
 
-  const transformData = useCallback((dataFields: DataField, dataConsent: SellData[]): TransformData[] => {
+  const transformData = useCallback((dataFields: DataField, dataConsent: any): TransformData[] => {
     const transformedData: TransformData[] = [];
-    dataConsent.forEach((consentData) => {
+    dataConsent.forEach((consentData: any) => {
       dataFields.forEach((fieldData) => {
         if (consentData.consent_name === fieldData.field_name && consentData.available_data_count !== 0) {
           transformedData.push({
@@ -77,5 +77,6 @@ export function usePortfolioStats() {
     getPortfolioStats,
     calculateTotalSum,
     transformData,
+    isLoadingConsent,
   };
 }

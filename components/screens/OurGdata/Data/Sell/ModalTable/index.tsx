@@ -25,9 +25,7 @@ function ModalTable({ data, openModal, isClose, value, id }: IProp) {
       overflow: 'auto',
     },
   };
-  useEffect(() => {
 
-  });
   return (
     <div className="p-5">
 

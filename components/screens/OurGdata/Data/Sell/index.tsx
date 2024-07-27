@@ -1,69 +1,54 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable no-return-assign  */
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Input from '@/components/UI/Input';
-import { maxWidth } from '@/constants';
-import Button from '@/components/UI/Button';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import { SELLINITIALVALUES } from '@/constants/auth';
 import { SellFormSchema } from '@/schema';
 import { usePersonalData } from '@/state/myGData/hooks';
 import { useFormik } from 'formik';
-import { useSellData, PERSONALData } from '@/hooks/useSell';
 import { convertToTitleCase } from '@/lib/index';
-import { useTableData } from '@/state/table/hook';
-import { io } from 'socket.io-client';
-import moment from 'moment';
-import { useSellValue } from '@/state/sell/hook';
+import { Socket } from 'socket.io-client';
 import { usePathname, useRouter } from 'next/navigation';
-import Modals from '@/components/UI/Modal';
+import { useConsentActions } from '@/hooks/useConsentActions';
+import Modal from '@/components/UI/ModalDraft';
+import Button from '@/components/UI/Button';
+import Input from '@/components/UI/Input';
+import useSocket from '@/hooks/useSocket';
 import Table from './Table';
-import TablePopUp from './TablePopUp';
-
+import { TConsentSellInfo, TUserConsentDeals } from '@/types';
+import { usePortfolioStats } from '@/hooks/usePortfolioStats';
+import Skeleton from '@/components/UI/LazyLoader';
 
 
 function Main() {
   const pathname = usePathname();
-  const { rData } = usePersonalData();
-  const [total, setTotal] = useState(0);
   const router = useRouter();
-  const { fetchData } = useSellData();
-  const { tableData, addRowToTable, fetchTableData } = useTableData();
-  const { fetchSellData, sellData } = useSellValue();
-  const [price, setPrice] = useState(0);
-  const title2 = pathname.split('/');
-  const titleValue = title2[title2.length - 2];
-  const [open, setOpen] = useState(false);
-  const title = convertToTitleCase(titleValue.charAt(0) + titleValue.slice(1).toLowerCase());
-  const socket = io(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_URL}market_place`, {
-    transports: ['websocket', 'polling'],
-    reconnection: true,
-  });
-  const fetchDataSetData = async () => {
-    const title2 = pathname.split('/');
-    const titleValue = title2[title2.length - 2];
-    const title = convertToTitleCase(titleValue.charAt(0) + titleValue.slice(1).toLowerCase());
-    await fetchSellData(title, rData);
-  };
-  useEffect(() => {
-    const fetchDataAndSetData = async () => {
-      const title2 = pathname.split('/');
-      const titleValue = title2[title2.length - 2];
-      const title = convertToTitleCase(titleValue.charAt(0) + titleValue.slice(1).toLowerCase());
-      await fetchSellData(title, rData);
 
-    };
-    if (!(sellData.consent_name.length < 0)) {
-      fetchDataAndSetData();
+  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal } = useConsentActions()
+  const { rData } = usePersonalData();
+  const { getPortfolioStatsForConsent, isLoadingConsent } = usePortfolioStats()
 
-    }
+  const [dataChanged, setDataChanged] = useState(true)
+  const [tableData, setTableData] = useState<TUserConsentDeals[]>([]);
+  const [consentSellInfo, setConsentSellInfo] = useState<TConsentSellInfo>()
+  const [currentConsentPrice, setCurrentConsentPrice] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  });
-  let validation = true;
+
+  const consentTitle = useMemo(() => {
+    const parts = pathname.split('/');
+    return convertToTitleCase(parts[parts.length - 2]);
+  }, [pathname]);
+
+
+  const consent: any = useMemo(() => {
+    return rData[consentTitle];
+  }, [pathname, consentTitle, rData]);
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
+
   const {
     handleSubmit,
     handleChange,
@@ -71,185 +56,149 @@ function Main() {
     touched,
     errors,
     setFieldValue,
-    isValid,
+    resetForm,
+    isSubmitting
   } = useFormik({
-    initialValues: {
-      ...SELLINITIALVALUES,
-
-    },
+    initialValues: SELLINITIALVALUES,
     validationSchema: SellFormSchema,
-    onSubmit: async (results: any, onSubmit: any) => {
-      if (isValid) {
-        const name: any = rData[title];
-        const { limitPrice, amount } = values;
-        const sellValues: PERSONALData = {
-          personal_data_field_id: name.id,
-          amount,
-          qunatity: limitPrice,
-        };
-        const data = await fetchData(sellValues);
-        const table = {
-          personal_data_field: { field_name: title },
-          status: data.data.status,
-          quantity: data.data.qunatity,
-          amount: data.data.amount,
-        };
-        addRowToTable(table);
-        await fetchDataSetData();
-      }
+    onSubmit: async (results, onSubmit) => {
+      const payload = {
+        personal_data_field_id: consent.id,
+        amount: Number(results.amount),
+        qunatity: Number(results.limitPrice)
+      };
+      onSubmit.setSubmitting(true)
+      await createSellConsentOffer(payload);
+      onSubmit.setSubmitting(false)
+      resetForm()
+      //fetch table data again  
+      setDataChanged(true)
+
     },
-  },
-  );
-  useEffect(() => {
-    const newTotal =
-      values?.amount &&
-      values.limitPrice &&
-      (values.amount * values.limitPrice || 0);
-    setTotal(newTotal || 0);
-  }, [values?.amount, values?.limitPrice, tableData]);
+  });
 
-  const handleMaxButtonClick = () => {
-    setFieldValue('limitPrice', sellData.available_data_count || '');
-    const value =
-      sellData.available_data_count && values.amount ? sellData.available_data_count * values.amount : 0;
-    setFieldValue('total', value);
-  };
-  const redirectToNewPath = () => {
-    const pathSegments = pathname.split('/');
-    const newPathSegments = pathSegments.slice(0, -1);
-    setFieldValue('total', '');
-    setFieldValue('amount', '');
-    setFieldValue('limitPrice', '');
-    const newPath = newPathSegments.join('/');
-    router.push(`${newPath}`);
+  const handleMax = () => {
+    if (!consentSellInfo) return
+    setFieldValue('limitPrice', consentSellInfo.available_data_count);
+    if (!values.amount) return;
+    const totalValue = consentSellInfo.available_data_count * Number(values.amount)
+    setFieldValue('total', totalValue);
   };
 
-  const handleLimitPriceChange = (e: any) => {
-    handleChange(e);
-    setTimeout(() => {
-      const newLimitPrice = e.target.value;
-      if (!Number.isNaN(newLimitPrice) && values?.amount) {
-        const newTotal = newLimitPrice * values?.amount;
-        setFieldValue('total', newTotal);
-      } else {
-        setFieldValue('total', 0.0);
+  const handleDeleteSellOrder = useCallback(async (orderId: number) => {
+    console.log('orderId :>> ', orderId);
+    await removeUserConsentDeal(orderId)
+    setDataChanged(true)
+  }, [])
+
+
+  const { isMaxLimitError, errorMessage } = useMemo(() => {
+    if (!consentSellInfo || Number(values.limitPrice) <= Number(consentSellInfo.available_data_count))
+      return {
+        isMaxLimitError: false,
+        errorMessage: ''
       }
-    }, 0);
-  };
-  useEffect(() => {
-    socket.on('connect', () => {
-      socket.emit('consent_averages', {
-        interval: [
-          moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00'),
-          moment().format('YYYY-MM-DD 00:00:00'),
-        ],
-      });
-    });
+    return {
+      isMaxLimitError: true, errorMessage: `Value should be less than ${consentSellInfo.available_data_count}`
+    }
+  }, [consentSellInfo, values.limitPrice]);
 
-    socket.on('consent_averages', (data) => {
-      if (data) {
-        const valueprice = data?.data?.find((item: any) => item.field_name === titleValue);
-        const averagePrice = valueprice?.average_price || 0;
-        setPrice(averagePrice);
-        setFieldValue('amount', averagePrice);
-      }
+  const onConnect = useCallback((socket: Socket) => {
+    socket.emit('consent_averages', {
+      interval: [TODAY, YESTERDAY],
     });
-    fetchDataSetData();
-    fetchTableData();
   }, []);
 
-  const [tableOpen, setTableOpen] = useState(false);
-  const handleClick = () => {
-    if (values.limitPrice! < sellData.available_data_count) {
-      setTableOpen(true);
-    }
-  };
-  const SellTitle = decodeURIComponent(sellData.consent_name);
-  console.log(SellTitle);
+  const eventHandlers = useMemo(() => ({
+    consent_averages: (data: any) => {
+      const parts = pathname.split('/')
+      const consentSlug = parts[parts.length - 2]
+      if (data && data.data) {
+        const valuePrice = data.data.find((item: any) => item.field_name === consentSlug);
+        if (!valuePrice) return
+        const averagePrice = valuePrice?.average_price || 0;
+        setCurrentConsentPrice(averagePrice);
+        setFieldValue('amount', averagePrice);
+      }
+    },
+  }), [setFieldValue, setCurrentConsentPrice]);
+
+  useSocket('market_place', eventHandlers, onConnect);
+
+  //update total when unit and amount changes
+  useEffect(() => {
+    if (!values.amount || !values.limitPrice) return
+    setFieldValue('total', Number(values.amount) * Number(values.limitPrice))
+  }, [values.amount, values.limitPrice])
+
+  useEffect(() => {
+    if (!dataChanged) return;
+    getUserConsentsDeals().then((data) => {
+      setTableData(data);
+      setDataChanged(false)
+    })
+  }, [dataChanged]);
+
+  useEffect(() => {
+    if (!consent.id) return
+    getPortfolioStatsForConsent(consent.id).then(data => {
+      setConsentSellInfo(data[0])
+    })
+  }, [consent])
+
   return (
-    <>{
-      tableOpen && (<TablePopUp openModal={tableOpen}
-        isClose={() => {
-          setTableOpen(!tableOpen);
-          // Call isClose function if it exists
-        }}
-
-        data2={sellData}
-      />)
-    }
-
-      {open && (
-        <Modals
-          isOpen={open}
-          closeModal={() => {
-            setOpen(false);
-            // Call isClose function if it exists
-          }}
-          handleActionClick={redirectToNewPath}
-          title="Do you really want to cancel? "
-        />
-      )}
+    <>
       <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
-        <h1 className="text-primary dark:text-main text-3xl font-bold font-sans mt-8 mb-7 justify-center items-center flex">
-          {/* {sellData.consent_name} */}
-        </h1>
-        <div className="flex justify-between items-center">
-          <p className="text-primary dark:text-main text-lg font-bold font-sans">
-            Last Price (24H ) :  ${price}
-          </p>
-          <p className="text-primary dark:text-main text-lg font-bold font-sans">
-            Maximum Units : {sellData.available_data_count}
-          </p>
-          <Button
-            className="bg-primary dark:bg-black dark:text-white font-bold font-sans px-8 mx-4 bg-slate-600 text-black"
-            title="Max"
-            type="button"
-            onClick={handleMaxButtonClick}
-          />
-        </div>
-        <form
-          className="flex flex-col gap-5 justify-center items-center"
-          noValidate
-          onSubmit={handleSubmit}
-        >
-          <div className="flex flex-col flex-wrap gap-x-14 gap-y-6 items-center justify-center">
+        {isLoadingConsent ?
+          <Skeleton />
+          :
+          <>
+            <h1 className="text-primary dark:text-main text-3xl font-bold font-sans mt-8 mb-7 text-center">
+              {consentSellInfo && convertToTitleCase(consentSellInfo.consent_name)}
+            </h1>
+            <div className="flex justify-between items-center">
+              <p className="text-primary dark:text-main text-lg font-bold font-sans">
+                Last Price &#40;24H&#41; :  ${currentConsentPrice}
+              </p>
+              <p className="text-primary dark:text-main text-lg font-bold font-sans">
+                {consentSellInfo && consentSellInfo.available_data_count}
+              </p>
+              <Button
+                className="bg-blue font-bold font-sans px-8 text-white py-2"
+                title="Max"
+                type="button"
+                onClick={handleMax}
+              />
+            </div>
+            <form
+              className="flex flex-col gap-5 justify-center items-center max-w-[450px] w-full mx-auto"
+              noValidate
+              onSubmit={handleSubmit}
+            >
             <Input
               label="Unit"
               placeholder="0.00"
               name="limitPrice"
-              onClick={() => {
-                handleClick();
-              }}
-              error={
-                (touched.limitPrice &&
-                  (errors.limitPrice ||
-                    (values.limitPrice &&
-                      values.limitPrice > (sellData.available_data_count || 0)
-                      ? (validation = false)
-                      : undefined))) ||
-                (values.limitPrice && values.limitPrice > (sellData.available_data_count || 0)
-                  ? 'Limit price should be less than or equal to the last price'
-                  : undefined)
-              }
-              value={values.limitPrice}
-              className="max-w-[450px] w-full"
-              max={sellData.available_data_count}
-              onChange={handleLimitPriceChange}
-              type="number"
-              min={0}
+                error={(touched.limitPrice && errors.limitPrice) || (isMaxLimitError && errorMessage)}
+                value={values.limitPrice}
+                className="w-full"
+                onChange={(e) => {
+                  if (/^\d*$/.test(e.target.value)) {
+                    handleChange(e)
+                  }
+                }}
             />
             <Input
               label="Amount ($)"
               placeholder="0.00"
-              name="amount"
-              type="number"
+                name="amount"
               error={touched.amount && errors.amount}
               value={values.amount}
-              className="max-w-[450px] w-full"
+                className="w-full"
               onChange={(e) => {
-                const newAmount = e.target.value;
-                handleChange(e);
-                setFieldValue('amount', newAmount); // Update values.amount
+                if (/^\d*\.?\d*$/.test(e.target.value)) {
+                  handleChange(e)
+                }
               }}
             />
             <Input
@@ -258,39 +207,71 @@ function Main() {
               readOnly
               name="total"
               error={touched.total && errors.total}
-              value={total}
-              className="max-w-[450px] w-full"
-            />
-          </div>
+                value={values.total}
+                className="w-full"
+              />
+              <div className="flex gap-x-4 my-4 w-full justify-center items-center">
+                <Button
+                  type="submit"
+                  className="bg-blue w-full disabled:bg-disabledBlue"
+                  title="Sell"
+                  disabled={isSubmitting}
+                />
+                <Button
+                  type="button"
+                  className="bg-[#F5B11A] w-full"
+                  title="Cancel"
+                  onClick={() => setIsModalOpen(true)
+                  }
+                  disabled={isSubmitting}
+                />
+              </div>
+            </form>
+          </>
+        }
 
-          <div className="flex gap-x-4 my-4 w-full justify-center items-center">
-            <Button
-              type="submit"
-              className="bg-blue w-full disabled:bg-disabledBlue max-w-[250px]"
-              title="Sell"
-              disabled={!isValid}
-              onClick={() => {
-                setFieldValue('total', total);
-
-
-              }}
-            />
-            <Button
-              type="submit"
-              className="bg-blue w-full disabled:bg-disabledBlue max-w-[250px]"
-              title="Cancel"
-              onClick={() => {
-                // redirectToNewPath()
-                setOpen(true);
-              }}
-            />
-          </div>
-        </form>
-
-        {tableData.length > 0 && <Table data={tableData} />}
+        <Table data={tableData} isLoadingData={isLoading} handleDeleteSellOrder={handleDeleteSellOrder} />
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title="Do you really want to cancel?"
+        className='py-3'
+      >
+        <div className="flex gap-x-4 my-4 w-full justify-center items-center">
+          <Button
+            onClick={() => { router.back() }}
+            className="bg-blue w-full disabled:bg-disabledBlue max-w-[250px]"
+            title="Yes"
+          />
+          <Button
+            type="button"
+            className="bg-[#F5B11A] w-full max-w-[250px]"
+            title="No"
+            onClick={closeModal}
+          />
+        </div>
+      </Modal>
     </>
   );
 }
 
 export default Main;
+
+
+
+
+
+
+// {
+//   tableOpen && (<TablePopUp openModal={tableOpen}
+//     isClose={() => {
+//       setTableOpen(!tableOpen);
+//       // Call isClose function if it exists
+//     }}
+//     // data2={sellData}
+//     data2={[]}
+//   />)
+// }
+
+

@@ -33,30 +33,30 @@ function TablePopUp({ data2, openModal, isClose }: IProp) {
                             });
                         }}
                     />
-                ),
-            },
-            {
-                Header: 'Date',
-                accessor: 'date',
-            },
-            {
-                Header: 'Name',
-                accessor: 'name',
-            },
-        ],
-        [selectedRowIds],
-    );
+              ),
+          },
+          {
+              Header: 'Date',
+              accessor: 'date',
+          },
+          {
+              Header: 'Name',
+              accessor: 'name',
+          },
+      ],
+      [selectedRowIds],
+  );
     const generateDataArray = (dataInfo: { available_data_count: any; consent_name: any; }) => {
         const { available_data_count, consent_name } = dataInfo;
         const data = [];
 
-        for (let i = 0; i < available_data_count; i++) {
-            data.push({
-                date: '1/12/2024',
-                name: consent_name.toLowerCase(),
-                checkbox: 'checkbox',
-            });
-        }
+      for (let i = 0; i < available_data_count; i++) {
+          data.push({
+              date: '1/12/2024',
+              name: consent_name.toLowerCase(),
+              checkbox: 'checkbox',
+          });
+      }
 
         return data;
     };
@@ -130,7 +130,7 @@ function TablePopUp({ data2, openModal, isClose }: IProp) {
                                             </td>
                                         ))}
                                     </tr>
-                                );
+                              );
                             })}
                         </tbody>
                     </table>
@@ -143,7 +143,7 @@ function TablePopUp({ data2, openModal, isClose }: IProp) {
                 </div>
             </Modal>
         </div>
-    );
+  );
 }
 
 export default TablePopUp;

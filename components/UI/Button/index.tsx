@@ -6,24 +6,24 @@ import React from 'react';
 import { StaticImageData } from 'next/image';
 import Image from '@/components/UI/StyledImage';
 import Loader from '@/components/UI/Loader';
-
+import { twMerge } from 'tailwind-merge'
 interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: StaticImageData;
   isLoading?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
-function Button({ onClick, type = 'button', title, isLoading = false, icon, className = '', style }: IProps) {
+function Button({ onClick, type = 'button', title, isLoading = false, disabled, icon, className = '', style }: IProps) {
   return (
     <button
-      className={[
+      className={
+        twMerge(
         'text-xl text-center font-sans font-bold text-white py-3 rounded-md relative  disabled:cursor-not-allowed',
-        className,
-      ].join(' ')}
+          className)}
       onClick={onClick}
       type={type}
       style={style}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
     >
       {icon && !isLoading && (
         <div className="absolute left-[9%] top-1/2 -translate-y-1/2">

@@ -67,7 +67,7 @@ function ActiveChat({ chats, userProfile, isLoggedIn, giveFeedback }: TProps) {
   }, [chats]);
 
   return (
-    <div className="px-10 pt-10 pb-12 overflow-y-auto h-[calc(100%_-_190px)] mobile:px-2 " ref={messagesRef}>
+    <div className="px-10 pt-10 overflow-y-auto h-[calc(100%_-_190px)] mobile:px-2 " ref={messagesRef}>
       {chats.map((msg) => (
         <Chat
           key={msg.messageID}

@@ -13,7 +13,6 @@ const useSocket = (
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    console.log('socketRef :>> ', socketRef);
     if (!socketRef.current) {
       const socket = connectSocket(namespace);
       socketRef.current = socket;

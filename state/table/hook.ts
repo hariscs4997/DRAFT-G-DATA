@@ -11,7 +11,6 @@ export const useTableData = () => {
 
   const addRowToTable = useCallback(
     (rowData: any) => {
-      console.log('rowData', rowData);
       dispatch(addTableRow(rowData));
     },
 

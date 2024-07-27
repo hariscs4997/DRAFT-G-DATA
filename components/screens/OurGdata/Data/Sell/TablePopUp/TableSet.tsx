@@ -1,13 +1,8 @@
-import { Column, useTable } from 'react-table';
+import { useTable } from 'react-table';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/context/ThemeProvider';
-import { LineChart } from '@/components/UI/LineChart2';
-import { trade_icon, buy_icon, loader_icon } from '@/public/assets';
-import Link from 'next/link';
-import Image from 'next/image';
-import { TransactionData, useBuyData } from '@/hooks/useBuy';
-import Modals from 'components/UI/Modal';
-import { useTableData } from "@/state/table/hook";
+import { TransactionData } from '@/hooks/useBuy';
+import { useTableData } from '@/state/table/hook';
 
 interface IProps {
     data: any;
@@ -36,19 +31,19 @@ function TableSet({ data, setSelectedRows }: IProps) {
                             });
                         }}
                     />
-                ),
-            },
-            {
-                Header: 'Date',
-                accessor: 'date',
-            },
-            {
-                Header: 'Name',
-                accessor: 'name',
-            },
-        ],
-        data,
-    });
+              ),
+          },
+          {
+              Header: 'Date',
+              accessor: 'date',
+          },
+          {
+              Header: 'Name',
+              accessor: 'name',
+          },
+      ],
+      data,
+  });
 
     useEffect(() => {
         const selectedRows = rows.filter((row: any) => selectedRowIds[row.id]);
@@ -56,8 +51,7 @@ function TableSet({ data, setSelectedRows }: IProps) {
     }, [selectedRowIds, rows, setSelectedRows]);
 
     return (
-        <>
-            <table {...getTableProps()} className="w-full">
+      <table {...getTableProps()} className="w-full">
                 <thead>
                     {headerGroups.map((headerGroup: any) => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
@@ -82,18 +76,17 @@ function TableSet({ data, setSelectedRows }: IProps) {
                                     <td
                                         key={cell.id}
                                         {...cell.getCellProps()}
-                                        className={`border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black dark:text-main font-sans font-normal text-base mobile:text-sm text-center`}
+                                        className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
                                     >
                                         {cell.render('Cell')}
                                     </td>
                                 ))}
                             </tr>
-                        );
+                      );
                     })}
                 </tbody>
-            </table>
-        </>
-    );
+      </table>
+  );
 }
 
-export default TableSet
+export default TableSet;

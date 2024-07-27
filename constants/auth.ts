@@ -38,7 +38,7 @@ export const SIGNUPFORMINITIALVALUES: SignupFormSchemaType = {
   accountType: ACCOUNTTYPESOPTIONS[0].label,
 };
 export const SELLINITIALVALUES: SellFormSchemaType = {
-  limitPrice: 0.0,
-  amount: 0.0,
-  total: 0.0,
+  limitPrice: '',
+  amount: '',
+  total: '',
 };

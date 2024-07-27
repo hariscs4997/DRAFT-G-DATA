@@ -66,21 +66,13 @@ export enum TableName {
   CData = 'Consent Data',
   CompData = 'Company Data',
 }
-export type DatatableType = {
-  name: string | undefined;
-  prices: number | undefined;
-  price?: number[];
-  timeFrame?: string[];
-  limitPrice?: number;
-  chardata?: { [key: string]: number } | undefined;
-  status: string | undefined;
-}[];
+
 export type PersonalDataType = {
   consents_to_sell: boolean;
   created_at: string;
   demanded_reward_value: string;
   id: number;
-  history:any;
+  history: any;
   personal_data_field: {
     field_name: string;
     user_id: number;
@@ -164,3 +156,33 @@ export type UpdateCompanyConsentPayload = {
   };
 }[];
 
+export type TCompanyConsentDeals = {
+  price: number;
+  id: number;
+  name: string;
+  unit: number;
+  status: string;
+  total: number;
+};
+
+export type TUserConsentDeals = {
+  amount: string;
+  created_at: string;
+  creator_id: number;
+  id: number;
+  personal_data_field_id: number;
+  qunatity: number;
+  status: string;
+  updated_at: string;
+};
+
+export type TConsentSellInfo = {
+  available_data_count: number;
+  available_data_market_value: number;
+  available_data_value: number;
+  consent_name: string;
+  total_data_count: number;
+  total_data_value: number;
+  used_in_deals_total_count: number;
+  used_in_deals_total_value: number;
+};

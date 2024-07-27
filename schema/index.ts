@@ -37,9 +37,9 @@ export const LoginFormSchema = object({
   password: string().required('Password is required'),
 });
 export const SellFormSchema = object({
-  limitPrice: number().min(1, 'Value must be at least 0'),
-  amount: number().min(0, 'Value must be at least 0'),
-  total: number().min(0, 'Value must be at least 0'),
+  limitPrice: string().required('Limit Price is required'),
+  amount: string().required('Amount is required'),
+  total: string(),
 });
 export const SignupFormSchema = object({
   firstName: string().min(2, 'First Name is too short').required('First Name is required'),
@@ -71,6 +71,10 @@ export const ConfirmPasswordFormSchema = object({
     .required('Confirm Password is required'),
 });
 
+export const ConsentBuyFormSchema = object({
+  amount: string().required('Amount is required'),
+});
+
 export type PersonalInfoSchemaType = InferType<typeof PersonalInfoSchema>;
 export type PersonalDataSchemaType = InferType<typeof PersonalDataSchema>;
 export type LoginFormSchemaType = InferType<typeof LoginFormSchema>;
@@ -79,3 +83,6 @@ export type ConfirmPasswordFormSchemaType = InferType<typeof ConfirmPasswordForm
 
 export type SignupFormSchemaType = InferType<typeof SignupFormSchema>;
 export type SellFormSchemaType = InferType<typeof SellFormSchema>;
+export type ConsentBuyFormSchemaType = InferType<typeof ConsentBuyFormSchema>;
+
+

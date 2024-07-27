@@ -1,17 +1,20 @@
-/* eslint-disable @typescript-eslint/indent */
 /* eslint-disable no-nested-ternary */
-import { Column, useTable } from 'react-table';
+
+'use client';
+
 import React, { useEffect, useState } from 'react';
+import { Column, useTable } from 'react-table';
 import { Columns } from '@/types';
-import { useTheme } from '@/context/ThemeProvider';
 import { LineChart } from '@/components/UI/LineChart2';
 import { trade_icon, buy_icon, loader_icon } from '@/public/assets';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TransactionData, useBuyData } from '@/hooks/useBuy';
-import Modals from '@/components/UI/Modal';
+import { TransactionData } from '@/hooks/useConsentActions';
+import Modal from '@/components/UI/ModalDraft';
 import { useTableData } from '@/state/table/hook';
 import { PATHS } from '@/constants/navigation';
+import { slugify } from '@/lib';
+import Button from '@/components/UI/Button';
 
 
 
@@ -20,11 +23,10 @@ interface IProps {
   columns: Column<Columns>[];
   personalId?: any
   isClose?: () => void;
-
 }
+
 function Table({ columns, data, personalId, isClose }: IProps) {
-  const { theme } = useTheme();
-  const [open, setOpen] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const { fetchTableData } = useTableData();
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
@@ -32,79 +34,55 @@ function Table({ columns, data, personalId, isClose }: IProps) {
     data,
   });
   const [sellData, setSellData] = useState(0);
-  const { selectedCompany, transactionDetails, fetchInterestedCompany } = useBuyData();
+  // const { selectedCompany, transactionDetails, fetchInterestedCompany } = useConsentBuy();
+
+  const closeModal = () => {
+    setIsOpenModal(false);
+  }
 
   const handleClick = () => {
     if (transactionData) {
       const { user_consent_deal_id: userConsentDealID, amount_offered: amountOffered, status } = transactionData;
-      const amountOfferedNumber = Number(amountOffered); // Convert amountOffered to a number
-      transactionDetails(
-        {
-          personal_data_field_id: personalId.personalId,
-          seller_id: userConsentDealID,
-          amount: amountOfferedNumber, // Use the converted amount
-          qunatity: personalId.quantity,
-          status,
-        },
-      );
+      const amountOfferedNumber = Number(amountOffered);
+      //   transactionDetails(
+      //     {
+      //       personal_data_field_id: personalId.personalId,
+      //       seller_id: userConsentDealID,
+      //       amount: amountOfferedNumber, // Use the converted amount
+      //       qunatity: personalId.quantity,
+      //       status,
+      //     },
+      //   );
+      // }
     }
     fetchTableData();
     if (isClose) isClose();
-
-  };
-
+  }
   const handleSellClick = async (id: any) => {
-    selectedCompany(id);
-    setOpen(true);
-    fetchInterestedCompany(personalId?.id);
+    console.log('id :>> ', id);
+    // selectedCompany(id);
+    // fetchInterestedCompany(personalId?.id);
     handleClick();
-
-    // if (transactionData) {
-    //   const { userConsentDealID, amountOffered, status } = transactionData;
-    //   const amountOfferedNumber = Number(amountOffered); // Convert amountOffered to a number
-    //   transactionDetails({ 
-    //     personal_data_field_id: personalId.personalId, 
-    //     seller_id: userConsentDealID, 
-    //     amount: amountOfferedNumber, // Use the converted amount
-    //     qunatity: personalId.quantity, 
-    //     status 
-    //   });
-    // }
   };
 
+  const [clickedRow, setClickedRow] = useState<number | null>(null); 
 
-  const [clickedRow, setClickedRow] = useState<number | null>(null); // State to track which row's image should change
-  useEffect(() => {
-    // Add any side effects based on data changes if needed
-  }, [data]);
   useEffect(() => {
     if (transactionData) {
       const { user_consent_deal_id: userConsentDealID, amount_offered: amountOffered, status } = transactionData;
       const amountOfferedNumber = Number(amountOffered); // Convert amountOffered to a number
-      transactionDetails({
-        personal_data_field_id: personalId.personalId,
-        seller_id: userConsentDealID,
-        amount: amountOfferedNumber, // Use the converted amount
-        qunatity: personalId.quantity,
-        status: status?.toUpperCase(),
-      });
+      // transactionDetails({
+      //   personal_data_field_id: personalId.personalId,
+      //   seller_id: userConsentDealID,
+      //   amount: amountOfferedNumber, // Use the converted amount
+      //   qunatity: personalId.quantity,
+      //   status: status?.toUpperCase(),
+      // });
     }
   }, [transactionData]);
 
   return (
     <>
-      {open && (
-        <Modals
-          isOpen={open}
-          closeModal={() => {
-            setOpen(false);
-            // Call isClose function if it exists
-          }}
-          handleActionClick={() => handleSellClick(sellData)}
-          title="Do you really want to sell?"
-          transition
-        />
-      )}
       <table {...getTableProps()} className="w-full">
         <thead>
           {headerGroups.map((headerGroup: any) => (
@@ -139,15 +117,15 @@ function Table({ columns, data, personalId, isClose }: IProps) {
                     )}
                     {cell.column.id === 'action' ? (
                       <Link
-                        href={`${PATHS.CHART}/${cell.row.original.name}`}
+                        href={`${PATHS.CHART}/${slugify(cell.row.original.name)}`}
                         className="justify-center items-center flex"
                         onClick={() => setClickedRow(row.index)}
                       >
                         <Image
-                          src={clickedRow === row.index ? loader_icon : trade_icon} // Change image if row is clicked
+                          src={clickedRow === row.index ? loader_icon : trade_icon}
                           alt="alt"
-                          className="cursor-pointer w-[25px] h-[25px] dark:invert-0 dark:brightness-100 dark:filter-1 dark:inset-0"
-                          style={{ filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none' }}
+                          className="cursor-pointer w-[25px] h-[25px] dark:invert-0 dark:brightness-100"
+
                         />
                       </Link>
                     ) : cell.column.id === 'name' ? (
@@ -163,18 +141,15 @@ function Table({ columns, data, personalId, isClose }: IProps) {
                         onClick={() => {
                           setTransactionData(row.original);
                           setSellData(row.original.id);
-                          setOpen(true);
-                          // handleSellClick(row.original.id)
-
-                          console.log('row.original', row.original);
+                          setIsOpenModal(true);
+                          handleSellClick(row.original.id);
                         }}
                         className="justify-center items-center flex mx-auto"
                       >
                         <Image
                           src={buy_icon}
                           alt="alt"
-                          className="cursor-pointer w-[30px] h-[35px] dark:invert-0 dark:brightness-100 dark:filter-1 dark:inset-0 justify-center flex items-center"
-                          style={{ filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none' }}
+                                className="cursor-pointer w-[30px] h-[35px] dark:invert-0 dark:brightness-100 justify-center flex items-center"
                         />
                       </button>
                     ) : (
@@ -183,14 +158,35 @@ function Table({ columns, data, personalId, isClose }: IProps) {
                   </td>
                 ))}
               </tr>
-
-
             );
           })}
         </tbody>
       </table>
+      <Modal
+        isOpen={isOpenModal}
+        onClose={closeModal}
+        title="Do you really want to sell?"
+      >
+        <div className='flex w-full gap-x-3'>
+          <Button
+            title='Yes'
+            className="bg-[#046C98] py-2 px-6 w-full max-w-[150px]"
+            isLoading={false}
+            onClick={() => {
+              handleSellClick(sellData);
+              closeModal();
+
+            }}
+          />
+          <Button
+            title='No'
+            className="bg-[#F5B11A] py-2 px-6 w-full max-w-[150px]"
+            onClick={closeModal}
+          />
+        </div>
+      </Modal>
     </>
   );
 }
 
-export default Table;
+export default Table

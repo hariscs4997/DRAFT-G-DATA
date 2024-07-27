@@ -23,7 +23,7 @@ function Input({
   isMonetaryInput,
   currency,
   min,
-  onClick 
+  onClick,
 }: IProps) {
   // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);

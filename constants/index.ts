@@ -147,7 +147,6 @@ export const INTERESTEDCOMPANYDATACOLUMNS: any = [
     Header: 'Interest Reason',
     accessor: 'interest_reason' as keyof Columns, // accessor is the "key" in the data
   },
-
   {
     Header: 'Sell',
     accessor: 'sell' as keyof Columns, // accessor is the "key" in the data

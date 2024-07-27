@@ -315,8 +315,20 @@ export const createRecentChatHistory = (payload: RecentChatHistoryResponseType[]
 export function convertToTitleCase(str: string) {
   if (str.includes('_')) {
     const words = str.split('_');
-    const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
+    const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
     return capitalizedWords.join(' ');
   }
-  return str;
+  if (str.includes('-')) {
+    const words = str.split('-');
+    const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+    return capitalizedWords.join(' ');
+  }
+  return str.substring(0, 1).toUpperCase().concat(str.substring(1).toLowerCase());
 }
+
+export const slugify = (path: string) => {
+  if (path.includes('_')) {
+    return path.toLowerCase().replaceAll('_', '-');
+  }
+  return path.toLowerCase().replaceAll(/\s+/g, '-');
+};

@@ -6,7 +6,7 @@ import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import { Socket } from 'socket.io-client';
 import useSocket from '@/hooks/useSocket';
 import { TransformData, usePortfolioStats } from '@/hooks/usePortfolioStats';
-import ProfileChart from './profileChart';
+import ProfileChart from './ProfileChart';
 import Table from './Table';
 
 
@@ -14,7 +14,9 @@ import Table from './Table';
 function Main() {
 
   const [tableData, setTableData] = useState<TransformData[]>();
+  const [isLoading, setIsLoading] = useState(true)
   const [sum, setSum] = useState(0);
+
   const { getPortfolioStats, calculateTotalSum, transformData } = usePortfolioStats();
 
   const onConnect = useCallback((socket: Socket) => {
@@ -32,6 +34,7 @@ function Main() {
         setTableData(transformedData);
         setSum(totalSum);
       }
+      setIsLoading(false)
     },
   }), [setTableData, setSum, transformData, calculateTotalSum, getPortfolioStats]);
 
@@ -51,7 +54,7 @@ function Main() {
           </div>
         </div>
         <h1 className="text-3xl font-bold items-center flex mb-2 dark:text-white">Assets</h1>
-        {tableData && <Table data={tableData} columns={ASSETSDATACOLUMNS} />}
+        <Table data={tableData} columns={ASSETSDATACOLUMNS} isLoadingData={isLoading} />
       </div>
     </div>
   );
