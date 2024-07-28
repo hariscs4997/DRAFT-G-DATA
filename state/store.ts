@@ -7,7 +7,6 @@ import MyGDataReducer from '@/state/myGData';
 import ChatsReducer from '@/state/chats';
 import SidebarReducer from '@/state/sidebar';
 import WeatherReducer from '@/state/weather';
-import tableReducer from '@/state/table';
 import storage from 'redux-persist/lib/storage';
 // import sellReducer from '@/state/sell';
 
@@ -18,7 +17,6 @@ const rootReducer = combineReducers({
   chats: ChatsReducer,
   sidebar: SidebarReducer,
   weather: WeatherReducer,
-  table: tableReducer,
   // Add other reducers here if you have any
 });
 

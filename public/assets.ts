@@ -31,6 +31,8 @@ import trade_icon2 from './icons/trade_icon2.png';
 import delete_icon from './icons/delete__icon.png';
 import buy_icon from './icons/buy_icon.png'
 import loader_icon from './icons/loader_icon.gif'
+import close_icon from './icons/close_icon.png';
+
 
 export {
   home,
@@ -65,7 +67,8 @@ export {
   trade_icon2,
   delete_icon,
   buy_icon,
-  loader_icon
+  loader_icon,
+  close_icon,
 };
 
 

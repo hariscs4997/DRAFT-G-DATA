@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic'
 import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import { SELLINITIALVALUES } from '@/constants/auth';
 import { SellFormSchema } from '@/schema';
@@ -14,17 +15,21 @@ import Modal from '@/components/UI/ModalDraft';
 import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import useSocket from '@/hooks/useSocket';
-import Table from './Table';
-import { TConsentSellInfo, TUserConsentDeals } from '@/types';
+import { TConsentSellInfo, TSelectedConsentForIntComp, TUserConsentDeals } from '@/types';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 import Skeleton from '@/components/UI/LazyLoader';
 
+
+const ConsentSellOrders = dynamic(() => import('./ConsentSellOrders'))
+const InterestedCompanies = dynamic(() => import('./InterestedCompanies'), {
+  loading: () => <Skeleton />
+})
 
 function Main() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal } = useConsentActions()
+  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany } = useConsentActions()
   const { rData } = usePersonalData();
   const { getPortfolioStatsForConsent, isLoadingConsent } = usePortfolioStats()
 
@@ -33,6 +38,9 @@ function Main() {
   const [consentSellInfo, setConsentSellInfo] = useState<TConsentSellInfo>()
   const [currentConsentPrice, setCurrentConsentPrice] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showInterestedCompanies, setShowInterestedCompanies] = useState(false)
+  const [selectedConsentForInterestedCompanies, setSelectedConsentForInterestedCompanies] = useState<TSelectedConsentForIntComp | undefined>()
+  const [interestedCompanies, setInterestedCompanies] = useState([])
 
 
   const consentTitle = useMemo(() => {
@@ -86,11 +94,46 @@ function Main() {
   };
 
   const handleDeleteSellOrder = useCallback(async (orderId: number) => {
-    console.log('orderId :>> ', orderId);
     await removeUserConsentDeal(orderId)
     setDataChanged(true)
   }, [])
 
+  const resetInterestedCompaniesData = () => {
+    setSelectedConsentForInterestedCompanies(undefined)
+    setInterestedCompanies([])
+  }
+
+  const handleToggleShowInterestedCompanies = useCallback(() => {
+    setShowInterestedCompanies(!showInterestedCompanies)
+    if (!showInterestedCompanies) resetInterestedCompaniesData()
+  }, [showInterestedCompanies])
+
+
+  const showInterestedCompaniesOnConsentSelect = useCallback(async (consent: any) => {
+    const consentDeals = await getConsentDealsById(consent.id);
+    setSelectedConsentForInterestedCompanies({
+      personalId: consent.personal_data_field_id,
+      quantity: consent.quantity,
+      id: consent.id
+    })
+    setInterestedCompanies(consentDeals.data)
+    setShowInterestedCompanies(true)
+  }, [])
+
+  const handleSellSelectedConsent = useCallback(async (consent: any) => {
+    if (!selectedConsentForInterestedCompanies) return
+    const payload = {
+      personal_data_field_id: selectedConsentForInterestedCompanies.personalId,
+      seller_id: consent.user_consent_deal_id,
+      amount: Number(consent.amount_offered),
+      qunatity: selectedConsentForInterestedCompanies.quantity,
+      status: consent.status.toUpperCase(),
+    }
+
+    await sellConsentToInterestedCompany(payload)
+    setDataChanged(true)
+    handleToggleShowInterestedCompanies()
+  }, [selectedConsentForInterestedCompanies])
 
   const { isMaxLimitError, errorMessage } = useMemo(() => {
     if (!consentSellInfo || Number(values.limitPrice) <= Number(consentSellInfo.available_data_count))
@@ -229,9 +272,18 @@ function Main() {
             </form>
           </>
         }
-
-        <Table data={tableData} isLoadingData={isLoading} handleDeleteSellOrder={handleDeleteSellOrder} />
+        <ConsentSellOrders
+          data={tableData}
+          isLoadingData={isLoading}
+          handleDeleteSellOrder={handleDeleteSellOrder}
+          handleSelectConsent={showInterestedCompaniesOnConsentSelect} />
       </div>
+      <InterestedCompanies
+        isShow={showInterestedCompanies}
+        onClose={handleToggleShowInterestedCompanies}
+        interestedCompanies={interestedCompanies}
+        sellConsentToCompany={handleSellSelectedConsent}
+      />
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -252,6 +304,7 @@ function Main() {
           />
         </div>
       </Modal>
+
     </>
   );
 }

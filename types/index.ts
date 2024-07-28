@@ -175,6 +175,11 @@ export type TUserConsentDeals = {
   status: string;
   updated_at: string;
 };
+export type TSelectedConsentForIntComp = {
+  personalId: number;
+  quantity: number;
+  id: number;
+};
 
 export type TConsentSellInfo = {
   available_data_count: number;

@@ -13,7 +13,7 @@ import Table from './Table';
 
 function Main() {
 
-  const [tableData, setTableData] = useState<TransformData[]>();
+  const [tableData, setTableData] = useState<TransformData[]>([]);
   const [isLoading, setIsLoading] = useState(true)
   const [sum, setSum] = useState(0);
 

@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-
 'use client';
 
 import React, { memo, useState } from 'react';
@@ -16,13 +14,15 @@ interface IProps {
   isLoadingData: boolean;
   data: TUserConsentDeals[]
   handleDeleteSellOrder: (orderId: number) => Promise<void>
+  handleSelectConsent: (consent: any) => Promise<void>
 }
 
-function Table({ data, isLoadingData, handleDeleteSellOrder }: IProps) {
+function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleSelectConsent }: IProps) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<number | undefined>();
   const [isDeletingOrder, setIsDeletingOrder] = useState(false)
+  const [isLoadingInterestedCompanies, setIsLoadingInterestedCompanies] = useState(false)
 
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
@@ -47,16 +47,7 @@ function Table({ data, isLoadingData, handleDeleteSellOrder }: IProps) {
     setIsModalOpen(false);
   };
 
-  const handleStatusClick = async (consent: any) => {
-  // setPersonal({
-  //   personalId: row.original.personal_data_field_id,
-  //   quantity: row.original.quantity,
-  //   id: row.original.id,
-  // });
-  // const data = await fetchInterestedCompany(id);
-  // setModalData(data);
-  // setIsInterest(true);
-  };
+
 
   return (
     <>
@@ -71,8 +62,8 @@ function Table({ data, isLoadingData, handleDeleteSellOrder }: IProps) {
                   <th
                     {...column.getHeaderProps()}
                     className={`border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap ${column.id === 'id' && 'hidden'
-                    // eslint-disable-next-line @typescript-eslint/indent
-                    }`}
+                      // eslint-disable-next-line @typescript-eslint/indent
+                      }`}
                   >
                     {column.render('Header')}
                   </th>
@@ -92,34 +83,38 @@ function Table({ data, isLoadingData, handleDeleteSellOrder }: IProps) {
                       className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
                     >
 
-                      {cell.column.id === 'action' ? (
-                        <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
-                          src={delete_icon}
-                          onClick={() => handleSelecOrderToDelete(row.original.id)}
-                          disabled={row.original.status === 'purchased'}
-                        />
-                      ) : cell.column.id === 'total' ? (
-                        row.original ?
-                          (
-                            row.original.amount * row.original.quantity
-                          ) : ''
+                      {cell.column.id === 'name' ? (
+                        <p>
+                          {row.original ?
+                            row.original.personal_data_field.field_name
+                            : null}
+                        </p>
+                      ) :
+                        cell.column.id === 'total' ? (
+                          <p>
+                            {row.original ? row.original.amount * row.original.quantity : ''}
+                          </p>
 
                         ) :
-                          cell.column.id === 'name' ? (
-                            row.original ?
-                              (
-                                row.original.
-                                  personal_data_field.field_name
-                              ) : null
-
+                          cell.column.id === 'action' ? (
+                            <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
+                              src={delete_icon}
+                              onClick={() => handleSelecOrderToDelete(row.original.id)}
+                              disabled={row.original.status === 'purchased'}
+                            />
                           ) :
                             cell.column.id === 'status' ? (
-                            <button type="button" className={`${row.original.status === 'interested' ? 'cursor-pointer' : 'cursor-not-allowed'}`} disabled={row.original.status !== 'interested'} onClick={() => handleStatusClick(row.original)}>
-                              {row.original.status}
-                            </button>
-                          ) : (
-                            cell.render('Cell')
-                          )}
+                              <Button type="button"
+                                className='text-black font-normal text-base'
+                                title={row.original.status}
+                                disabled={row.original.status != 'interested' || isLoadingInterestedCompanies} onClick={async () => {
+                                  setIsLoadingInterestedCompanies(true)
+                                  await handleSelectConsent(row.original)
+                                  setIsLoadingInterestedCompanies(false)
+                                }} />
+                            ) : (
+                              cell.render('Cell')
+                            )}
                     </td>
                   ))}
                 </tr>
@@ -150,18 +145,8 @@ function Table({ data, isLoadingData, handleDeleteSellOrder }: IProps) {
           />
         </div>
       </Modal>
-
-      {/* {isInterested && (
-        <ModalTable
-          openModal={isInterested}
-          isClose={closeModal}
-          value="Interested Company"
-          data={modalData}
-          id={personal}
-        />
-      )} */}
     </>
   );
 }
 
-export default memo(Table);
+export default memo(ConsentSellOrders);

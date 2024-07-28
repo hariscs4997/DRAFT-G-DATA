@@ -19,15 +19,12 @@ import { convertToTitleCase, slugify } from '@/lib';
 import { PATHS } from '@/constants/navigation';
 import { useTheme } from '@/context/ThemeProvider';
 
-type DataType = {
+type TLineChartData = {
   created_at: string[] | undefined;
   amount: number[] | undefined;
   type: string;
   marker: { color: string };
 };
-
-
-
 
 export default function Main() {
 
@@ -38,7 +35,7 @@ export default function Main() {
 
   const [selectedTimeRange, setSelectedTimeRange] = useState('1 DAY');
   const [chartType, setChartType] = useState('line');
-  const [lineChartData, setLineChartData] = useState<DataType[]>([]);
+  const [lineChartData, setLineChartData] = useState<TLineChartData[]>([]);
   const [candleChartData, setCandleChartData] = useState<any>();
 
   const TITLE = useMemo(() => pathname.split('/').pop(), [pathname]);
@@ -163,7 +160,3 @@ export default function Main() {
     </div>
   );
 }
-
-
-
-

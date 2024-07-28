@@ -13,7 +13,7 @@ interface IProps {
 
 function Modal({ isOpen, onClose, title, children, className = ' ' }: IProps) {
     return (
-        <div className={`fixed inset-0 z-50 items-center justify-center overflow-auto bg-black bg-opacity-50 ${isOpen ? 'flex' : 'hidden'}`}>
+        <div className={`fixed h-full w-full inset-0 z-50 items-center justify-center overflow-auto bg-black bg-opacity-50 ${isOpen ? 'flex' : 'hidden'}`}>
             <div className={twMerge("relative py-10 px-4 bg-[#F0E5D8] dark:bg-[#B6B6B5] w-full max-w-[500px] rounded-lg", className)}>
                 <button
                     type="button"

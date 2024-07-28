@@ -9,21 +9,22 @@ type TBuyConsentOfferPayload = {
   amount_offered: number;
 };
 
-export type TSellConsentOfferPayload = {
+type TSellConsentOfferPayload = {
   personal_data_field_id: any;
   amount: number | undefined;
   qunatity: number | undefined;
 };
 
-export type TransactionData = {
-  personal_data_field_id: Number | undefined;
-  seller_id: Number | undefined;
-  amount: Number | undefined;
-  qunatity: Number | undefined;
-  status: String | undefined;
-  user_consent_deal_id?: Number | undefined;
-  amount_offered?: Number | undefined;
+type TTransactionDetails = {
+  personal_data_field_id: number;
+  seller_id: number;
+  amount: number;
+  qunatity: number;
+  status: string;
+  user_consent_deal_id?: number;
+  amount_offered?: number;
 };
+
 export const useConsentActions = () => {
   const { isLoading, setIsLoading } = useLoading();
 
@@ -104,11 +105,10 @@ export const useConsentActions = () => {
     }
   }, []);
 
-  const transactionDetails = useCallback(async (transactionData: TransactionData) => {
+  const sellConsentToInterestedCompany = useCallback(async (transactionDetails: TTransactionDetails) => {
     try {
-      const { data } = await api.post('api/deal_transaction', transactionData);
+      const { data } = await api.post('api/deal_transaction', transactionDetails);
       toast.success('Transaction Successfully Done');
-      // await fetchTableData();
       return data;
     } catch (error) {
       console.log('error :>> ', error);
@@ -120,7 +120,7 @@ export const useConsentActions = () => {
     createBuyConsentOffer,
     getCompanyConsentsDeals,
     updateBuyingConsenOffer,
-    transactionDetails,
+    sellConsentToInterestedCompany,
     getUserConsentsDeals,
     isLoading,
     createSellConsentOffer,
