@@ -191,3 +191,10 @@ export type TConsentSellInfo = {
   used_in_deals_total_count: number;
   used_in_deals_total_value: number;
 };
+
+export type TLineChartData = {
+  created_at: string[] | undefined;
+  amount: number[] | undefined;
+  type: string;
+  marker: { color: string };
+};

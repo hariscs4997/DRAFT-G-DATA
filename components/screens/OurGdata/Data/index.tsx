@@ -11,7 +11,7 @@ import { trade_icon } from '@/public/assets';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PATHS } from '@/constants/navigation';
-import { slugify } from '@/lib';
+import { capitalize, slugify } from '@/lib';
 
 function Main() {
   const [tableData, setTableData] = useState<any>([]);
@@ -34,9 +34,9 @@ function Main() {
       if (data && data.data) {
         setTableData(
           data.data.map((item: any) => ({
-            name: item.field_name,
-            price: item.average_price,
-          })),
+            name: capitalize(item.field_name),
+            price: `$${item.average_price}`,
+          })).filter((item: any) => item.name != "Date"),
         );
         if (isLoading) setIsLoading(false);
       }

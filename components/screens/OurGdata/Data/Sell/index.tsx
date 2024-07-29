@@ -314,17 +314,3 @@ export default Main;
 
 
 
-
-
-// {
-//   tableOpen && (<TablePopUp openModal={tableOpen}
-//     isClose={() => {
-//       setTableOpen(!tableOpen);
-//       // Call isClose function if it exists
-//     }}
-//     // data2={sellData}
-//     data2={[]}
-//   />)
-// }
-
-

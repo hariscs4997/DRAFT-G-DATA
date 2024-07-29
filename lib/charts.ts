@@ -6,7 +6,6 @@ export const getIntervalFromSelectedValue = (
   numOfHour: number;
   interval: string[];
 } => {
-  console.log('selected :>> ', selectedTimeRange);
   if (selectedTimeRange === '1 YEAR') {
     return {
       numOfHour: 24,

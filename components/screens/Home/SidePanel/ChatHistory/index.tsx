@@ -17,14 +17,14 @@ function ChatHistory({ groupedChatHistory, openPreviousChats }: IProps) {
           {value.map((msg) => (
             <button
               type="button"
-              className="flex flex-row gap-x-4 px-3 py-4 bg-chat dark:bg-darkChat"
+              className="flex flex-row gap-x-3 justify-start px-3 py-4 bg-chat dark:bg-darkChat"
               key={uuidv4()}
               onClick={() => {
                 openPreviousChats(msg);
               }}
             >
-              <Image src={chat} alt="chat-icon" className="w-[24px] h-[24px] dark:invert" />
-              <p className="text-primary font-raleway font-semibold text-lg dark:text-main">{msg.title}</p>
+              <Image src={chat} alt="chat-icon" className="w-[24px] h-[24px] dark:invert flex-shrink-0" />
+              <p className="text-primary font-raleway font-semibold text-lg dark:text-main text-left">{msg.title}</p>
             </button>
           ))}
         </Fragment>

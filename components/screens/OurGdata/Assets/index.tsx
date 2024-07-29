@@ -16,6 +16,7 @@ function Main() {
   const [tableData, setTableData] = useState<TransformData[]>([]);
   const [isLoading, setIsLoading] = useState(true)
   const [sum, setSum] = useState(0);
+  const [lineChartData, setLineChartData] = useState<any>();
 
   const { getPortfolioStats, calculateTotalSum, transformData } = usePortfolioStats();
 
@@ -36,6 +37,19 @@ function Main() {
       }
       setIsLoading(false)
     },
+    consent_line_chart_data: (data: any) => {
+      console.log('Received data from consent_line_chart_data -->', data.data);
+      if (data && data.data) {
+        // const formattedData = TITLE && data.data[TITLE].map((item: any) => ({
+        //   x: item.created_at,
+        //   y: item.amount,
+        //   type: 'scatter',
+        //   mode: 'lines+markers',
+        //   marker: { color: 'red' },
+        // }));
+        // setLineChartData(formattedData);
+      }
+    },
   }), [setTableData, setSum, transformData, calculateTotalSum, getPortfolioStats]);
 
   useSocket('market_place', eventHandlers, onConnect);
@@ -50,7 +64,7 @@ function Main() {
             <p className="text-xl font-semibold dark:text-white">Total Balance</p>
           </div>
           <div className="min-w-[300px] mx-2 my-6">
-            <ProfileChart />
+            <ProfileChart data={lineChartData} />
           </div>
         </div>
         <h1 className="text-3xl font-bold items-center flex mb-2 dark:text-white">Assets</h1>

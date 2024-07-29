@@ -7,7 +7,7 @@ import MyGDataReducer from '@/state/myGData';
 import ChatsReducer from '@/state/chats';
 import SidebarReducer from '@/state/sidebar';
 import WeatherReducer from '@/state/weather';
-import storage from 'redux-persist/lib/storage';
+import { storage } from './noopStroage';
 // import sellReducer from '@/state/sell';
 
 const rootReducer = combineReducers({

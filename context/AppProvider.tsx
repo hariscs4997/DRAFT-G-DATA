@@ -63,6 +63,7 @@ function AppProvider({ children }: IProps) {
     try {
       const { data } = await api.get('api/user_consents_rewards');
       const rData = createTableData({ tableName: TableName.RData, data: data.data });
+      console.log('rData :>> ', rData);
       setRData(rData);
       const consentTableData = createTableData({ tableName: TableName.CData, data: data.data });
       setCData(consentTableData);

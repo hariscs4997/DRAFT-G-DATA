@@ -107,13 +107,6 @@ export const REWARDSTABLEDATA = {
     id: null,
     Unit: DESCRIPTIONANDUNITOFVARIABLES.journaling.unit,
   },
-  Date: {
-    Consent: 'TRUE',
-    PDefinedValue: '0.00',
-    OtherCompValue: '0.0',
-    id: null,
-    Unit: DESCRIPTIONANDUNITOFVARIABLES.date.unit,
-  },
   'Emotional List': {
     Consent: 'FALSE',
     PDefinedValue: '0.00',

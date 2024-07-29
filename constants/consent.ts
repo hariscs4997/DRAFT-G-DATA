@@ -40,6 +40,7 @@ export const CONSENTTABLECOLUMNS: Column<Columns>[] = [
     accessor: 'id' as keyof Columns, // accessor is the "key" in the data
   },
 ];
+
 export const DATATABLECOLUMNS: Column<Columns>[] = [
   {
     Header: 'Name',
@@ -54,6 +55,7 @@ export const DATATABLECOLUMNS: Column<Columns>[] = [
     accessor: 'action' as keyof Columns, // accessor is the "key" in the data
   },
 ];
+
 export const SELLDATACOLUMNS: any = [
   {
     Header: 'Name',
@@ -80,6 +82,7 @@ export const SELLDATACOLUMNS: any = [
     accessor: 'status' as keyof Columns, // accessor is the "key" in the data
   },
 ];
+
 export const BUYDATACOLUMNS: any = [
   {
     Header: 'Name',
@@ -106,6 +109,7 @@ export const BUYDATACOLUMNS: any = [
     accessor: 'status' as keyof Columns, // accessor is the "key" in the data
   },
 ];
+
 export const ASSETSDATACOLUMNS: Column<Columns>[] = [
   {
     Header: 'Name',
@@ -124,6 +128,7 @@ export const ASSETSDATACOLUMNS: Column<Columns>[] = [
     accessor: 'total' as keyof Columns, // accessor is the "key" in the data
   },
 ];
+
 export const CONSENTTABLEDATA = {
   'Emotional Overall': {
     Consent: 'FALSE',
@@ -239,16 +244,6 @@ export const CONSENTTABLEDATA = {
     Consent: 'FALSE',
     Definition: DESCRIPTIONANDUNITOFVARIABLES.journaling.definition,
     Unit: DESCRIPTIONANDUNITOFVARIABLES.journaling.unit,
-    Companies: [],
-    Use: '',
-    Threshold: '',
-    Pricing: '',
-    id: null,
-  },
-  Date: {
-    Consent: 'FALSE',
-    Definition: DESCRIPTIONANDUNITOFVARIABLES.date.definition,
-    Unit: DESCRIPTIONANDUNITOFVARIABLES.date.unit,
     Companies: [],
     Use: '',
     Threshold: '',

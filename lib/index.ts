@@ -67,7 +67,7 @@ export const capitalize = (arg: string) => {
   const text = arg.split(' ').filter((item) => item.length > 0);
   let result = '';
   if (text.length > 0) {
-    result = text.map((word) => word[0].toUpperCase() + word.slice(1, word.length)).join(' ');
+    result = text.map((word) => word[0].toUpperCase() + word.slice(1, word.length).toLowerCase()).join(' ');
   }
 
   return result;

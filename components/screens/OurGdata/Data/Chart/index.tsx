@@ -1,15 +1,12 @@
-/* eslint-disable @typescript-eslint/indent */
-
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
 import LineChart from '@/components/UI/LineChart';
 import CandleChart from '@/components/UI/CandleChart';
 import { DATATIMETYPESOPTIONS } from '@/constants/our_g_data';
-import { maxWidth, transformData } from '@/constants';
+import { maxWidth, TODAY, transformData, YESTERDAY } from '@/constants';
 import Select from '@/components/UI/Select';
 import { usePathname, useRouter } from 'next/navigation';
-import { DATATABLEDATA } from '@/temp';
 import Button from '@/components/UI/Button';
 import { Socket } from 'socket.io-client';
 import { useUser } from '@/state/user/hooks';
@@ -18,13 +15,9 @@ import { getIntervalFromSelectedValue } from '@/lib/charts';
 import { convertToTitleCase, slugify } from '@/lib';
 import { PATHS } from '@/constants/navigation';
 import { useTheme } from '@/context/ThemeProvider';
+import { TLineChartData } from '@/types';
 
-type TLineChartData = {
-  created_at: string[] | undefined;
-  amount: number[] | undefined;
-  type: string;
-  marker: { color: string };
-};
+
 
 export default function Main() {
 
@@ -35,11 +28,11 @@ export default function Main() {
 
   const [selectedTimeRange, setSelectedTimeRange] = useState('1 DAY');
   const [chartType, setChartType] = useState('line');
-  const [lineChartData, setLineChartData] = useState<TLineChartData[]>([]);
+  const [lineChartData, setLineChartData] = useState<any>();
   const [candleChartData, setCandleChartData] = useState<any>();
+  const [consentLivePrice, setConsentLivePrice] = useState('') 
 
   const TITLE = useMemo(() => pathname.split('/').pop(), [pathname]);
-  const GRAPHDATA = useMemo(() => DATATABLEDATA.find((item: any) => slugify(item.name) === TITLE), [TITLE]);
 
   const handleDataTypeChange = (selectedValue: string) => {
     setSelectedTimeRange(selectedValue);
@@ -66,9 +59,11 @@ export default function Main() {
 
   const onConnect = useCallback((socket: Socket) => {
     const { interval, numOfHour } = getIntervalFromSelectedValue(selectedTimeRange);
-    console.log('interval :>> ', interval);
     socket.emit('consent_line_chart_data', { interval });
     socket.emit('consent_candle_chart_data', { relative_interval: 'h', num_of_hours: numOfHour });
+    socket.emit('consent_averages', {
+      interval: [TODAY, YESTERDAY],
+    });
   }, [selectedTimeRange]);
 
 
@@ -90,14 +85,22 @@ export default function Main() {
     consent_line_chart_data: (data: any) => {
       console.log('Received data from consent_line_chart_data -->', data.data);
       if (data && data.data) {
-        const formattedData = TITLE && data.data[TITLE].map((item: any) => ({
+        const formattedData: TLineChartData[] = TITLE && data.data[TITLE].map((item: any) => ({
           x: item.created_at,
           y: item.amount,
           type: 'scatter',
           mode: 'lines+markers',
           marker: { color: 'red' },
         }));
-        setLineChartData(formattedData);
+
+        setLineChartData(transformData(formattedData));
+      }
+    },
+    consent_averages: (data: any) => {
+      if (data && data.data) {
+        const selectedConsent = data.data.find((consent: any) => slugify(consent.field_name) === TITLE)
+        if (!selectedConsent) return
+        setConsentLivePrice(selectedConsent.average_price)
       }
     },
   }), [TITLE]);
@@ -113,7 +116,7 @@ export default function Main() {
       </p>
       <div className="justify-between flex items-center mx-4">
         <p className="font-bold text-[24px] dark:text-white">
-          Price : {GRAPHDATA?.prices} $
+          Price : {consentLivePrice}$
         </p>
         <div className="flex mx-4 gap-x-6">
           <Select
@@ -136,7 +139,7 @@ export default function Main() {
       <div className="flex justify-center items-center my-4 w-full rounded-md relative">
         <div className="flex justify-center items-center my-4 relative bg-zinc-300 w-fit min-h-[400px]">
           {chartType === 'line' ? (
-            <LineChart data={transformData(lineChartData)} layout={CHARTLAYOUT} />
+            <LineChart data={lineChartData} layout={CHARTLAYOUT} />
           ) : (
               <CandleChart data={candleChartData} layout={CHARTLAYOUT} />
           )}

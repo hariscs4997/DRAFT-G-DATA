@@ -54,8 +54,8 @@ export const useConsentActions = () => {
 
   const removeUserConsentDeal = useCallback(async (orderId: number) => {
     try {
-      const { data } = await api.delete(`api/user_consent_deals/${orderId}`);
-      return data.data;
+        await api.delete(`api/user_consent_deals/${orderId}/`);
+        toast.success('Order removed successfully');
     } catch (error) {
       console.log('error :>> ', error);
     }
