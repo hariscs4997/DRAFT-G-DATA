@@ -1,6 +1,7 @@
 import React from 'react';
 import Container from '@/components/UI/Containers';
-import Main from '@/components/screens/OurGdata/Assets';
+import dynamic from 'next/dynamic';
+const Main = dynamic(() => import('@/components/screens/OurGdata/Assets'))
 
 export default function Assets() {
   return (

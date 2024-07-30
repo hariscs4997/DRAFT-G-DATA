@@ -84,8 +84,8 @@ export default function Main() {
     },
     consent_line_chart_data: (data: any) => {
       console.log('Received data from consent_line_chart_data -->', data.data);
-      if (data && data.data) {
-        const formattedData: TLineChartData[] = TITLE && data.data[TITLE].map((item: any) => ({
+      if (data && data.data && data.data[TITLE!]) {
+        const formattedData: TLineChartData[] = data.data[TITLE!].map((item: any) => ({
           x: item.created_at,
           y: item.amount,
           type: 'scatter',

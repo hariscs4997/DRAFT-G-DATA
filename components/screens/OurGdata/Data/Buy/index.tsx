@@ -86,8 +86,8 @@ function Main() {
         <Skeleton /> :
       <table {...getTableProps()} className="w-full overflow-auto">
         <thead>
-          {headerGroups.map((headerGroup: any) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroups.map((headerGroup: any, index) => (
+              <tr key={index} {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column: any) => (
                 <th
                   {...column.getHeaderProps()}
@@ -100,10 +100,11 @@ function Main() {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map((row: any) => {
+            {rows.map((row: any, index) => {
             prepareRow(row);
             return (
               <tr
+                key={index}
                 {...row.getRowProps()}
                 className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat"
               >

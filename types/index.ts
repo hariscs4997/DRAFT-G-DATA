@@ -198,3 +198,20 @@ export type TLineChartData = {
   type: string;
   marker: { color: string };
 };
+
+export type TAvailableConsentUnit = {
+  consents_to_sell: boolean;
+  created_at: string;
+  deal_id: any;
+  demanded_reward_value: string;
+  files: any[];
+  history: any;
+  id: number;
+  personal_data_field: {
+    field_name: string;
+    user_id: number;
+  };
+  personal_data_field_id: number;
+  sold: boolean;
+  value: string;
+};

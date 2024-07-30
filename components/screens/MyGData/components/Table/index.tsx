@@ -34,10 +34,12 @@ function Table({ columns, data }: IProps) {
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {rows.map((row: any) => {
+        {rows.map((row: any, index) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+            <tr
+              key={index}
+              {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
               {row.cells.map((cell: any) => (
                 <td
                   key={cell.id}

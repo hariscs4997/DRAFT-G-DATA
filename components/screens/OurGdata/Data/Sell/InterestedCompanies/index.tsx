@@ -25,6 +25,7 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
       isOpen={isShow}
       onRequestClose={onClose}
       shouldCloseOnOverlayClick
+      ariaHideApp={false}
     >
       <div className="mx-auto rounded-md">
         <IconButton className='relative w-4 h-4 mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
@@ -40,8 +41,9 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
           <thead>
             {headerGroups.map((headerGroup: any) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column: any) => (
+                {headerGroup.headers.map((column: any, index: number) => (
                   <th
+                    key={index}
                     {...column.getHeaderProps()}
                     className={`border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap ${column.id === 'id' && 'hidden'
                       }`}
@@ -53,10 +55,10 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {rows.map((row: any) => {
+            {rows.map((row: any, index) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+                <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
                   {row.cells.map((cell: any) => (
                     <td
                       key={cell.id}

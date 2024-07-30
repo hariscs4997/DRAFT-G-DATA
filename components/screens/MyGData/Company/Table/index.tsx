@@ -94,8 +94,8 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
   return (
     <table {...getTableProps()} className="w-full">
       <thead>
-        {headerGroups.map((headerGroup: any) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroups.map((headerGroup: any, index) => (
+          <tr key={index} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column: any) => (
               <th
                 {...column.getHeaderProps()}
@@ -110,10 +110,10 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {rows.map((row: any) => {
+        {rows.map((row: any, index) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()} key={row.id}>
+            <tr key={index} {...row.getRowProps()}>
               {row.cells.map((cell: any, cellIndex: number) => (
                 <td
                   key={cell.id}

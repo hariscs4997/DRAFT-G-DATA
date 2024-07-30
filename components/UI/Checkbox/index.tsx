@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './styles.module.css';
 
 interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: JSX.Element;
+  label: JSX.Element | string;
   error: string | boolean | undefined;
 }
 

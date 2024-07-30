@@ -16,7 +16,7 @@ function Main() {
   const [tableData, setTableData] = useState<TransformData[]>([]);
   const [isLoading, setIsLoading] = useState(true)
   const [sum, setSum] = useState(0);
-  const [lineChartData, setLineChartData] = useState<any>();
+  const [lineChartData, setLineChartData] = useState<any>([]);
 
   const { getPortfolioStats, calculateTotalSum, transformData } = usePortfolioStats();
 

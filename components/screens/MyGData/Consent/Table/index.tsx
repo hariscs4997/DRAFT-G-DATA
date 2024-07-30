@@ -40,8 +40,10 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
   return (
     <table {...getTableProps()} className="w-full">
       <thead>
-        {headerGroups.map((headerGroup: any) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroups.map((headerGroup: any, index) => (
+          <tr
+            key={index}
+            {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column: any) => (
               <th
                 {...column.getHeaderProps()}
@@ -56,10 +58,10 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {rows.map((row: any) => {
+        {rows.map((row: any, index) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+            <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
               {row.cells.map((cell: any) => (
                 <td
                   key={cell.id}

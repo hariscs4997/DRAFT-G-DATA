@@ -1,34 +1,45 @@
-import React, { useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { useTable } from 'react-table';
 import { close_icon } from '@/public/assets';
 import Button from '@/components/UI/Button';
 import IconButton from '@/components/UI/IconButton';
+import { AVAILABLECONSENTUNITSCOLUMN } from '@/constants/consent';
+import Checkbox from '@/components/UI/Checkbox';
 
 interface IProp {
     isOpen: boolean
     onClose: () => void;
-    consentId: number
+    availableConsentUnits: any,
+    handleSelectedAvailableUnits: (availableUnits: number[]) => void
 }
 
-function ConsentUnitsSelectionPopup({ isOpen, onClose }: IProp) {
-
-    const [consentUnitsData, setConsentUnitsData] = useState([])
-    const [selectedConsentUnits, setSelectedConsentUnits] = useState<{ [key: string]: boolean }>({});
+function ConsentUnitsSelectionPopup({ isOpen, onClose, availableConsentUnits, handleSelectedAvailableUnits }: IProp) {
     const [isLoading, setIsLoading] = useState(false)
+    const [selectedAvailableConsentUnits, setSelectedAvailableConsentUnits] = useState<{ [key: number]: boolean }>({})
+
 
     const { rows, getTableBodyProps, getTableProps, headerGroups, prepareRow } = useTable({
-        data: [],
-        columns: []
+        data: availableConsentUnits,
+        columns: AVAILABLECONSENTUNITSCOLUMN
     })
-
     const handleSave = () => {
-        console.log('Save');
+        const selectedUnitsIDs: number[] = Object.keys(selectedAvailableConsentUnits).filter((key: string) => selectedAvailableConsentUnits[Number(key)]).map(Number);
+        handleSelectedAvailableUnits(selectedUnitsIDs)
+        onClose()
+    }
+
+    const toggleSelectedConsentUnit = (consentId: number) => {
+        setSelectedAvailableConsentUnits((prev) => ({
+            ...prev,
+            [consentId]: !prev[consentId]
+        }))
     }
     return (
         <Modal
             isOpen={isOpen}
             onRequestClose={onClose}
+            ariaHideApp={false}
             shouldCloseOnOverlayClick
         >
             <div className="mx-auto rounded-md">
@@ -39,10 +50,11 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose }: IProp) {
                     disabled={isLoading}
                 />
 
+                {availableConsentUnits && 
                 <table {...getTableProps()} className="w-full">
                     <thead>
-                        {headerGroups.map((headerGroup: any) => (
-                            <tr {...headerGroup.getHeaderGroupProps()}>
+                            {headerGroups.map((headerGroup: any, index) => (
+                                <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                                 {headerGroup.headers.map((column: any) => (
                                     <th
                                         {...column.getHeaderProps()}
@@ -55,17 +67,34 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose }: IProp) {
                         ))}
                     </thead>
                     <tbody {...getTableBodyProps()}>
-                        {rows.map((row: any) => {
+                            {rows.map((row: any, index) => {
                             prepareRow(row);
                             return (
-                                <tr {...row.getRowProps()} className="even:bg-[#d4d4d4] dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+                                <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4] dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
                                     {row.cells.map((cell: any) => (
                                         <td
                                             key={cell.id}
                                             {...cell.getCellProps()}
-                                            className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
+                                            className={`border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black dark:text-main font-sans font-normal text-base mobile:text-sm text-center ${selectedAvailableConsentUnits[row.original.id] && 'bg-[#bccfa6]'}`}
                                         >
-                                            {cell.render('Cell')}
+                                            {cell.column.id === 'checkbox' ?
+                                                <Checkbox
+                                                    checked={selectedAvailableConsentUnits[row.original.id]}
+                                                    onChange={() => toggleSelectedConsentUnit(row.original.id)}
+                                                    name={`consent-unit-${row.original.id}`}
+                                                    id={`consent-unit-${row.original.id}`}
+                                                    className="w-fit"
+                                                    error=''
+                                                    label=""
+                                                />
+                                                :
+                                                cell.column.id === 'name' ?
+                                                    <p>{row.original.personal_data_field.field_name}</p>
+                                                    :
+                                                    cell.column.id === 'values' ?
+                                                        <p>{row.original.value}</p>
+                                                        :
+                                                        cell.render('Cell')}
                                         </td>
                                     ))}
                                 </tr>
@@ -73,6 +102,7 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose }: IProp) {
                         })}
                     </tbody>
                 </table>
+                }
                 <div className="flex justify-center mt-4 gap-x-5">
                     <Button
                         onClick={handleSave}
@@ -90,4 +120,4 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose }: IProp) {
     );
 }
 
-export default ConsentUnitsSelectionPopup;
+export default memo(ConsentUnitsSelectionPopup);

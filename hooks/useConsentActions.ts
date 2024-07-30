@@ -13,6 +13,7 @@ type TSellConsentOfferPayload = {
   personal_data_field_id: any;
   amount: number | undefined;
   qunatity: number | undefined;
+  consent_snapshot: number[];
 };
 
 type TTransactionDetails = {
@@ -54,8 +55,8 @@ export const useConsentActions = () => {
 
   const removeUserConsentDeal = useCallback(async (orderId: number) => {
     try {
-        await api.delete(`api/user_consent_deals/${orderId}/`);
-        toast.success('Order removed successfully');
+      await api.delete(`api/user_consent_deals/${orderId}/`);
+      toast.success('Order removed successfully');
     } catch (error) {
       console.log('error :>> ', error);
     }
@@ -115,6 +116,15 @@ export const useConsentActions = () => {
     }
   }, []);
 
+  const getAvailableConsentUnitsToSell = useCallback(async (consentId: number) => {
+    try {
+      const { data } = await api.get(`api/available_data_to_sell/${consentId}/`);
+      return data.data;
+    } catch (error) {
+      console.log('error :>> ', error);
+    }
+  }, []);
+
   return {
     getConsentDealsById,
     createBuyConsentOffer,
@@ -125,5 +135,6 @@ export const useConsentActions = () => {
     isLoading,
     createSellConsentOffer,
     removeUserConsentDeal,
+    getAvailableConsentUnitsToSell,
   };
 };

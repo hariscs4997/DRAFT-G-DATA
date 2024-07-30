@@ -128,6 +128,24 @@ export const ASSETSDATACOLUMNS: Column<Columns>[] = [
     accessor: 'total' as keyof Columns, // accessor is the "key" in the data
   },
 ];
+export const AVAILABLECONSENTUNITSCOLUMN: Column<Columns>[] = [
+  {
+    Header: '',
+    accessor: 'checkbox' as keyof Columns,
+  },
+  {
+    Header: 'Name',
+    accessor: 'name' as keyof Columns,
+  },
+  {
+    Header: 'Values',
+    accessor: 'values' as keyof Columns, // accessor is the "key" in the data
+  },
+  // {
+  //   Header: 'Price',
+  //   accessor: 'price' as keyof Columns, // accessor is the "key" in the data
+  // },
+];
 
 export const CONSENTTABLEDATA = {
   'Emotional Overall': {
