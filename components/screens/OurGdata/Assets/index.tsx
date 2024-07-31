@@ -6,7 +6,7 @@ import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import { Socket } from 'socket.io-client';
 import useSocket from '@/hooks/useSocket';
 import { TransformData, usePortfolioStats } from '@/hooks/usePortfolioStats';
-import ProfileChart from './ProfileChart';
+import ProfileChart from './tmp';
 import Table from './Table';
 
 
