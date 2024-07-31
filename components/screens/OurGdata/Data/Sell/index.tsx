@@ -99,7 +99,7 @@ function Main() {
       }
       payload = {
         ...payload,
-        consent_snapshots: selectedAvailableConsentUnits
+        consent_snapshots: selectedAvailableConsentUnits.map((id) => ({ id }))
       };
       onSubmit.setSubmitting(true)
       await createSellConsentOffer(payload);

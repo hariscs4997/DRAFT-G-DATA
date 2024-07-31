@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { useFormik } from 'formik';
 import Link from 'next/link';
@@ -8,14 +9,13 @@ import Input from '@/components/UI/Input';
 import Select from '@/components/UI/Select';
 import Button from '@/components/UI/Button';
 import Checkbox from '@/components/UI/Checkbox';
-import { SignupCredentials } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 type TProps = {
-  isLoading: boolean;
-  registerUser: (payload: SignupCredentials) => void;
 };
 
-function SignupForm({ isLoading, registerUser }: TProps) {
+function SignupForm({ }: TProps) {
+  const { registerUser, isLoading } = useAuth();
   const { handleSubmit, handleChange, values, touched, errors, setFieldValue } = useFormik({
     initialValues: SIGNUPFORMINITIALVALUES,
     validationSchema: SignupFormSchema,

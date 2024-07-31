@@ -1,19 +1,23 @@
+'use client'
+
 import React, { memo } from 'react';
 import Container from '@/components/UI/Containers';
 import { add, no_chats } from '@/public/assets';
 import Button from '@/components/UI/Button';
-import { TGroupedChatHistory, THistory } from '@/state/chats/types';
-import NoData from '@/components/UI/NoDataMessage';
-import ChatHistory from './ChatHistory';
+import { useAuth } from '@/hooks/useAuth';
+import { useChatBot } from '@/hooks/useChatBot';
+import dynamic from 'next/dynamic';
 
-type TProps = {
-  isAuthenticated: boolean;
-  recentChatHistory: TGroupedChatHistory;
-  openPreviousChats: (payload: THistory) => void;
-  newChat: () => void;
-};
+const ChatHistory = dynamic(() => import('./ChatHistory'))
+const NoData = dynamic(() => import('@/components/UI/NoDataMessage'))
 
-function SidePanel({ isAuthenticated, recentChatHistory, openPreviousChats, newChat }: TProps) {
+
+type TProps = {};
+
+function SidePanel({ }: TProps) {
+  const { isAuthenticated } = useAuth();
+  const { recentChatHistory, openPreviousChats, startNewChat: newChat } = useChatBot();
+
   return (
     <Container
       type="side"
@@ -38,5 +42,6 @@ function SidePanel({ isAuthenticated, recentChatHistory, openPreviousChats, newC
     </Container>
   );
 }
+
 
 export default memo(SidePanel);

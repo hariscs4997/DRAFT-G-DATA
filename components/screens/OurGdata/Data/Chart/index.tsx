@@ -18,8 +18,11 @@ import { useTheme } from '@/context/ThemeProvider';
 import { TLineChartData } from '@/types';
 
 
+type TProps = {
+  slug: string
+}
 
-export default function Main() {
+export default function Main({ slug }: TProps) {
 
   const { user } = useUser();
   const pathname = usePathname();
@@ -32,7 +35,6 @@ export default function Main() {
   const [candleChartData, setCandleChartData] = useState<any>();
   const [consentLivePrice, setConsentLivePrice] = useState('') 
 
-  const TITLE = useMemo(() => pathname.split('/').pop(), [pathname]);
 
   const handleDataTypeChange = (selectedValue: string) => {
     setSelectedTimeRange(selectedValue);
@@ -84,8 +86,8 @@ export default function Main() {
     },
     consent_line_chart_data: (data: any) => {
       console.log('Received data from consent_line_chart_data -->', data.data);
-      if (data && data.data && data.data[TITLE!]) {
-        const formattedData: TLineChartData[] = data.data[TITLE!].map((item: any) => ({
+      if (data && data.data && data.data[slug!]) {
+        const formattedData: TLineChartData[] = data.data[slug!].map((item: any) => ({
           x: item.created_at,
           y: item.amount,
           type: 'scatter',
@@ -98,12 +100,12 @@ export default function Main() {
     },
     consent_averages: (data: any) => {
       if (data && data.data) {
-        const selectedConsent = data.data.find((consent: any) => slugify(consent.field_name) === TITLE)
+        const selectedConsent = data.data.find((consent: any) => slugify(consent.field_name) === slug)
         if (!selectedConsent) return
         setConsentLivePrice(selectedConsent.average_price)
       }
     },
-  }), [TITLE]);
+  }), [slug]);
 
   useSocket('market_place', eventHandlers, onConnect);
 
@@ -112,7 +114,7 @@ export default function Main() {
   return (
     <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
       <p className="font-bold text-[28px] dark:text-white justify-center items-center flex mb-4">
-        {convertToTitleCase(TITLE ?? '')}
+        {convertToTitleCase(slug ?? '')}
       </p>
       <div className="justify-between flex items-center mx-4">
         <p className="font-bold text-[24px] dark:text-white">

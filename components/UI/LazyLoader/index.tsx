@@ -25,10 +25,7 @@ const Skeleton = () => {
                     <div className="w-full bg-zinc-300  rounded-t-lg h-72 ms-6 dark:bg-gray-700"></div>
                     <div className="w-full bg-zinc-300  rounded-t-lg h-80 ms-6 dark:bg-gray-700"></div>
                 </div>
-            </div>
-     
-
-
+        </div>
     )
 }
 export default Skeleton

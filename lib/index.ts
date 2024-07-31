@@ -1,6 +1,3 @@
-/* eslint-disable consistent-return */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-restricted-syntax */
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Column } from 'react-table';

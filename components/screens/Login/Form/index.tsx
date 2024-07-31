@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { useFormik } from 'formik';
 import Link from 'next/link';
@@ -6,14 +7,15 @@ import { LOGINFORMINITIALVALUES } from '@/constants/auth';
 import { PATHS } from '@/constants/navigation';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
-import { UserCredentials } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 type TProps = {
-  isLoading: boolean;
-  loginUser: (payload: UserCredentials) => void;
+
 };
 
-function LoginForm({ isLoading, loginUser }: TProps) {
+function LoginForm() {
+  const { loginUser, isLoading } = useAuth();
+
   const { handleSubmit, handleChange, values, touched, errors } = useFormik({
     initialValues: LOGINFORMINITIALVALUES,
     validationSchema: LoginFormSchema,

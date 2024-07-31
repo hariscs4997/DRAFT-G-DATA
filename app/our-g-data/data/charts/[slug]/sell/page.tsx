@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Container from '@/components/UI/Containers';
 import Main from '@/components/screens/OurGdata/Data/Sell';
