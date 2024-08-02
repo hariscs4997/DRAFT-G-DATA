@@ -11,7 +11,9 @@ export default function Consent({ params }: { params: { slug: string } }) {
   );
 }
 export async function generateStaticParams() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/fetch-consent-names`);
+  const baseUrl = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_BASE_URL : "http://localhost:3000"
+
+  const response = await fetch(`${baseUrl}/api/fetch-consent-names`);
   const { data } = await response.json();
 
   if (!response.ok) {
