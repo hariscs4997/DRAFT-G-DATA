@@ -10,16 +10,16 @@ export default function Consent({ params }: { params: { slug: string } }) {
     </Container>
   );
 }
-export async function generateStaticParams() {
-  const baseUrl = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_BASE_URL : "http://localhost:3000"
+// export async function generateStaticParams() {
+//   const baseUrl = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_BASE_URL : "http://localhost:3000"
 
-  const response = await fetch(`${baseUrl}/api/fetch-consent-names`);
-  const { data } = await response.json();
+//   const response = await fetch(`${baseUrl}/api/fetch-consent-names`);
+//   const { data } = await response.json();
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch consent data');
-  }
-  return data.map((item: any) => ({
-    slug: slugify(item.field_name)
-  }));
-}
+//   if (!response.ok) {
+//     throw new Error('Failed to fetch consent data');
+//   }
+//   return data.map((item: any) => ({
+//     slug: slugify(item.field_name)
+//   }));
+// }
