@@ -17,7 +17,6 @@ export const PATHS = {
   TERMS: 'https://www.g-datalabs.com/terms_condition',
   CONFIRMPASSWORD: '/reset_password/confirm',
   DATA: '/our-g-data/data',
-  CHART: '/our-g-data/data/charts',
   ASSETS: '/our-g-data/assets',
-  BUY: '/our-g-data/data/charts/buy',
+  BUY: '/our-g-data/data/buy',
 };

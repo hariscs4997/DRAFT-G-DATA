@@ -7,10 +7,10 @@ export const getIntervalFromSelectedValue = (
   interval: string[];
 } => {
   if (selectedTimeRange === '1 YEAR') {
-    return {
-      numOfHour: 24,
-      interval: [moment().subtract(1, 'year').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 00:00:00')],
-    };
+  return {
+    numOfHour: 8766,
+    interval: [moment().subtract(1, 'year').format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD 00:00:00')],
+  };
   }
   if (selectedTimeRange === '1 DAY') {
     return {

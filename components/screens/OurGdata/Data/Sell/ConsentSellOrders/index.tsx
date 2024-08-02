@@ -9,6 +9,7 @@ import Button from '@/components/UI/Button';
 import IconButton from '@/components/UI/IconButton';
 import { TUserConsentDeals } from '@/types';
 import Skeleton from '@/components/UI/LazyLoader';
+import NoData from '@/components/UI/NoDataMessage';
 
 interface IProps {
   isLoadingData: boolean;
@@ -71,6 +72,7 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
               </tr>
             ))}
           </thead>
+          {data.length > 0 ?
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any, index) => {
               prepareRow(row);
@@ -120,7 +122,9 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
                 </tr>
               );
             })}
-          </tbody>
+            </tbody> :
+            <NoData />
+          }
         </table>
       }
       <Modal

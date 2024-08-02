@@ -254,57 +254,59 @@ function Main() {
   return (
     <>
       <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
-        {isLoadingConsent ?
-          <Skeleton />
-          :
+        {consentSellInfo &&
           <>
             <h1 className="text-primary dark:text-main text-3xl font-bold font-sans mt-8 mb-7 text-center">
-              {consentSellInfo && convertToTitleCase(consentSellInfo.consent_name)}
+            {convertToTitleCase(consentSellInfo.consent_name)}
             </h1>
             <div className="flex justify-between items-center">
               <p className="text-primary dark:text-main text-lg font-bold font-sans">
                 Last Price &#40;24H&#41; :  ${currentConsentPrice}
               </p>
               <p className="text-primary dark:text-main text-lg font-bold font-sans">
-                {consentSellInfo && consentSellInfo.available_data_count}
+              {consentSellInfo.available_data_count}
               </p>
               <Button
-                className="bg-blue font-bold font-sans px-8 text-white py-2"
-                title="Max"
-                type="button"
-                onClick={handleMax}
-              />
-            </div>
-            <form
-              className="flex flex-col gap-5 justify-center items-center max-w-[450px] w-full mx-auto"
-              noValidate
-              onSubmit={handleSubmit}
-            >
+              className="bg-blue font-bold font-sans px-8 text-white py-2 disabled:bg-disabledBlue"
+              title="Max"
+              type="button"
+              onClick={handleMax}
+              disabled={isLoadingConsent}
+            />
+          </div>
+          <form
+            className="flex flex-col gap-5 justify-center items-center max-w-[450px] w-full mx-auto"
+            noValidate
+            onSubmit={handleSubmit}
+          >
             <Input
-                label="Unit"
-                placeholder="0.00"
-                name="limitPrice"
-                error={(touched.limitPrice && errors.limitPrice) || (isLimitPriceInValid && limitPriceErrorMessage)}
-                value={values.limitPrice}
-                className="w-full"
-                onChange={(e) => {
-                  if (/^\d*$/.test(e.target.value)) {
-                    handleChange(e)
-                  }
-                }}
+              label="Unit"
+              placeholder="0.00"
+              name="limitPrice"
+              error={(touched.limitPrice && errors.limitPrice) || (isLimitPriceInValid && limitPriceErrorMessage)}
+              value={values.limitPrice}
+              className="w-full"
+              onChange={(e) => {
+                if (/^\d*$/.test(e.target.value)) {
+                  handleChange(e)
+                }
+              }}
+              disabled={isLoadingConsent}
             />
             <Input
-                label="Amount ($)"
-                placeholder="0.00"
-                name="amount"
-                error={(touched.amount && errors.amount) || (isAmountIsInValid && amountErrorMessage)}
-                value={values.amount}
-                className="w-full"
-                onChange={(e) => {
-                  if (/^\d*\.?\d*$/.test(e.target.value)) {
-                    handleChange(e)
-                  }
+              label="Amount ($)"
+              placeholder="0.00"
+              name="amount"
+              error={(touched.amount && errors.amount) || (isAmountIsInValid && amountErrorMessage)}
+              value={values.amount}
+              className="w-full"
+              onChange={(e) => {
+                if (/^\d*\.?\d*$/.test(e.target.value)) {
+                  handleChange(e)
+                }
               }}
+              disabled={isLoadingConsent}
+
             />
             <Input
               label="Total"
@@ -312,23 +314,24 @@ function Main() {
               readOnly
               name="total"
               error={touched.total && errors.total}
-                value={values.total}
-                className="w-full"
+              value={values.total}
+              className="w-full"
+
+            />
+            <div className="flex gap-x-4 my-4 w-full justify-center items-center">
+              <Button
+                type="submit"
+                className="bg-blue w-full disabled:bg-disabledBlue"
+                title="Sell"
+                disabled={isSubmitting || isLoadingConsent}
               />
-              <div className="flex gap-x-4 my-4 w-full justify-center items-center">
-                <Button
-                  type="submit"
-                  className="bg-blue w-full disabled:bg-disabledBlue"
-                  title="Sell"
-                  disabled={isSubmitting}
-                />
-                <Button
-                  type="button"
-                  className="bg-[#F5B11A] w-full"
-                  title="Cancel"
-                  onClick={() => setIsModalOpen(true)
-                  }
-                  disabled={isSubmitting}
+              <Button
+                type="button"
+                className="bg-[#F5B11A] w-full disabled:bg-[#f4dca9]"
+                title="Cancel"
+                onClick={() => setIsModalOpen(true)
+                }
+                disabled={isSubmitting || isLoadingConsent}
                 />
               </div>
             </form>

@@ -4,7 +4,7 @@ import React from 'react';
 import { Column, useTable } from 'react-table';
 import { Columns } from '@/types';
 import NoData from '@/components/UI/NoDataMessage';
-import Skeleton from '@/components/UI/LazyLoader';
+import Loader from '@/components/UI/Loader';
 
 interface IProps {
   data: any;
@@ -21,8 +21,7 @@ function Table({ columns, data, isLoadingData }: IProps) {
 
   return (
     <>
-      {isLoadingData ?
-        <Skeleton /> :
+
         <table {...getTableProps()} className="w-full -mt-2">
           <thead>
             {headerGroups.map((headerGroup: any, index) => (
@@ -53,16 +52,19 @@ function Table({ columns, data, isLoadingData }: IProps) {
                     `}
                       >
                         {cell.column.id === 'total'
-                          ? (row.original.total = row.original.quantity * row.original.price)
+                          ? (row.original.quantity * row.original.price)
                           : cell.render('Cell')}
                       </td>
                     ))}
                   </tr>
                 );
               })}
-            </tbody> : <NoData />}
-        </table>
-      }
+          </tbody> :
+          !isLoadingData && <NoData />
+        }
+      </table>
+      {isLoadingData && <div className='flex justify-center mt-[200px]'>
+        <Loader className='w-10 h-10' /></div>}
     </>
   );
 }

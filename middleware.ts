@@ -32,10 +32,7 @@ export default async function middleware(request: NextRequest) {
       pathname === PATHS.COMPANY ||
       pathname.includes(PATHS.MYGDATA) ||
       pathname === PATHS.HISTORY ||
-      pathname === PATHS.CHART ||
-      pathname === PATHS.ASSETS ||
-      pathname === PATHS.DATA ||
-      pathname === PATHS.OURGDATA) &&
+      pathname.includes(PATHS.OURGDATA)) &&
     !cookie
   ) {
     return NextResponse.redirect(new URL(PATHS.HOME, request.url));

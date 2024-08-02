@@ -53,9 +53,10 @@ function Table({ columns, data }: IProps) {
         <thead>
           {headerGroups.map((headerGroup: any, index) => (
             <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column: any) => (
+              {headerGroup.headers.map((column: any, key: number) => (
                 /* eslint-disable */
                 <th
+                  key={key}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   className={
                     'border-table border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans mx-auto justify-center'

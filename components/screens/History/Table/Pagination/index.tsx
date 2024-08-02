@@ -10,7 +10,6 @@ interface IProps {
 
 function Pagination({ pageIndex, previousPage, canPreviousPage, nextPage, canNextPage }: IProps) {
   return (
-    /* eslint-disable */
     <div className="mt-5 mx-auto w-fit">
       <button
         onClick={previousPage}
@@ -28,7 +27,6 @@ function Pagination({ pageIndex, previousPage, canPreviousPage, nextPage, canNex
         Next
       </button>
     </div>
-    /* eslint-enable */
   );
 }
 

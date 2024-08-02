@@ -1,14 +1,14 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import UserReducer from '@/state/user';
 import LoadingReducer from '@/state/loading';
 import MyGDataReducer from '@/state/myGData';
 import ChatsReducer from '@/state/chats';
 import SidebarReducer from '@/state/sidebar';
 import WeatherReducer from '@/state/weather';
-import { storage } from './noopStroage';
-// import sellReducer from '@/state/sell';
+import OurGDataReducer from '@/state/ourGData';
+import storage from 'redux-persist/lib/storage';
 
 const rootReducer = combineReducers({
   user: UserReducer,
@@ -17,23 +17,25 @@ const rootReducer = combineReducers({
   chats: ChatsReducer,
   sidebar: SidebarReducer,
   weather: WeatherReducer,
+  our_g_data: OurGDataReducer,
   // Add other reducers here if you have any
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['loading', 'chats', 'my_g_data', 'table'],
+  blacklist: ['loading', 'chats', 'my_g_data', 'our_g_data'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,
+  devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST'],
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
 });

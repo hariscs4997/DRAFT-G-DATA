@@ -5,34 +5,39 @@ import { ASSETSDATACOLUMNS } from '@/constants/consent';
 import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import { Socket } from 'socket.io-client';
 import useSocket from '@/hooks/useSocket';
-import { TransformData, usePortfolioStats } from '@/hooks/usePortfolioStats';
+import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 import ProfileChart from './ProfileChart';
 import Table from './Table';
+import { getIntervalFromSelectedValue } from '@/lib/charts';
+import { useOurGData } from '@/state/ourGData/hooks';
 
 
 
 function Main() {
-
-  const [tableData, setTableData] = useState<TransformData[]>([]);
-  const [isLoading, setIsLoading] = useState(true)
+  const { consentAssetsData, setConsentAssetsData } = useOurGData()
+  const [isLoading, setIsLoading] = useState(consentAssetsData.length === 0)
   const [sum, setSum] = useState(0);
   const [lineChartData, setLineChartData] = useState<any>([]);
 
   const { getPortfolioStats, calculateTotalSum, transformData } = usePortfolioStats();
 
+  const { interval } = useMemo(() => getIntervalFromSelectedValue('1 DAY'), [])
+
   const onConnect = useCallback((socket: Socket) => {
     socket.emit('consent_averages', {
       interval: [TODAY, YESTERDAY],
     });
+    socket.emit('consent_line_chart_data', { interval });
+
   }, []);
 
   const eventHandlers = useMemo(() => ({
     consent_averages: async (data: any) => {
       const portfolioStats = await getPortfolioStats();
       if (data && data.data) {
-        const transformedData = transformData(data.data, portfolioStats);
-        const totalSum = calculateTotalSum(transformedData);
-        setTableData(transformedData);
+        const consentAssets = transformData(data.data, portfolioStats);
+        const totalSum = calculateTotalSum(consentAssets);
+        setConsentAssetsData(consentAssets);
         setSum(totalSum);
       }
       setIsLoading(false)
@@ -50,7 +55,7 @@ function Main() {
         // setLineChartData(formattedData);
       }
     },
-  }), [setTableData, setSum, transformData, calculateTotalSum, getPortfolioStats]);
+  }), [setConsentAssetsData, setSum, transformData, calculateTotalSum, getPortfolioStats]);
 
   useSocket('market_place', eventHandlers, onConnect);
 
@@ -68,7 +73,7 @@ function Main() {
           </div>
         </div>
         <h1 className="text-3xl font-bold items-center flex mb-2 dark:text-white">Assets</h1>
-        <Table data={tableData} columns={ASSETSDATACOLUMNS} isLoadingData={isLoading} />
+        <Table data={consentAssetsData} columns={ASSETSDATACOLUMNS} isLoadingData={isLoading} />
       </div>
     </div>
   );

@@ -3,6 +3,8 @@ import { connectSocket, disconnectSocket } from '@/lib/socket';
 import { useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 
+const POLLING_ONE_MIN = 10000;
+
 const useSocket = (
   namespace: string,
   eventHandlers: { [event: string]: (...args: any[]) => void } = {},
@@ -11,6 +13,7 @@ const useSocket = (
   onError?: (error: any) => void,
 ) => {
   const socketRef = useRef<Socket | null>(null);
+  let intervalId: NodeJS.Timeout | null = null;
 
   useEffect(() => {
     if (!socketRef.current) {
@@ -19,7 +22,12 @@ const useSocket = (
 
       socket.on('connect', () => {
         console.log(`Connected to WebSocket server ${namespace}`);
-        if (onConnect) onConnect(socket);
+        if (onConnect) {
+          onConnect(socket);
+          intervalId = setInterval(() => {
+            onConnect(socket);
+          }, POLLING_ONE_MIN);
+        }
       });
 
       socket.on('disconnect', (reason) => {
@@ -43,6 +51,7 @@ const useSocket = (
         disconnectSocket();
         socketRef.current = null;
       }
+      if (intervalId) clearInterval(intervalId);
     };
   }, [namespace, onConnect, onDisconnect, onError, eventHandlers]);
 

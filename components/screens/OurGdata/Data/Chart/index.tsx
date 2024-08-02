@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import LineChart from '@/components/UI/LineChart';
 import CandleChart from '@/components/UI/CandleChart';
 import { DATATIMETYPESOPTIONS } from '@/constants/our_g_data';
@@ -59,14 +59,16 @@ export default function Main({ slug }: TProps) {
     };
   }, [theme]);
 
+
+  const { interval, numOfHour } = useMemo(() => getIntervalFromSelectedValue(selectedTimeRange), [selectedTimeRange])
+
   const onConnect = useCallback((socket: Socket) => {
-    const { interval, numOfHour } = getIntervalFromSelectedValue(selectedTimeRange);
     socket.emit('consent_line_chart_data', { interval });
     socket.emit('consent_candle_chart_data', { relative_interval: 'h', num_of_hours: numOfHour });
     socket.emit('consent_averages', {
       interval: [TODAY, YESTERDAY],
     });
-  }, [selectedTimeRange]);
+  }, [selectedTimeRange,interval,numOfHour]);
 
 
   const eventHandlers = useMemo(() => ({
@@ -107,7 +109,12 @@ export default function Main({ slug }: TProps) {
     },
   }), [slug]);
 
+
   useSocket('market_place', eventHandlers, onConnect);
+
+  // useEffect(()=>{
+ 
+  // },[selectedTimeRange])
 
 
 
@@ -139,7 +146,7 @@ export default function Main({ slug }: TProps) {
         </div>
       </div>
       <div className="flex justify-center items-center my-4 w-full rounded-md relative">
-        <div className="flex justify-center items-center my-4 relative bg-zinc-300 w-fit min-h-[400px]">
+        <div className="flex justify-center items-center my-4 relative bg-chat dark:bg-gray w-[400px] max-w-fit min-h-[400px]">
           {chartType === 'line' ? (
             <LineChart data={lineChartData} layout={CHARTLAYOUT} />
           ) : (
@@ -150,11 +157,10 @@ export default function Main({ slug }: TProps) {
       </div>
       <div className="flex justify-center items-center gap-x-4">
         <Button
-          type="submit"
           className={`w-full disabled:bg-black max-w-[250px] 
           ${user?.accountType?.toLowerCase() === 'company' ? 'bg-blue block' : 'hidden'}`}
           title="BUY"
-          onClick={() => router.push(`${PATHS.CHART}/buy`)}
+          onClick={() => router.push(`${PATHS.BUY}`)}
         />
         <Button
           className="bg-[#F5B11A] w-full max-w-[250px]"

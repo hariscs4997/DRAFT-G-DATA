@@ -1,38 +1,33 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import { DATATABLECOLUMNS } from '@/constants/consent';
-import Skeleton from '@/components/UI/LazyLoader';
 import useSocket from '@/hooks/useSocket';
-import { Socket } from 'socket.io-client';
 import { useTable } from 'react-table';
 import { trade_icon } from '@/public/assets';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PATHS } from '@/constants/navigation';
 import { capitalize, slugify } from '@/lib';
+import { Socket } from 'socket.io-client';
+import NoData from '@/components/UI/NoDataMessage';
+import Loader from '@/components/UI/Loader';
+import { useOurGData } from '@/state/ourGData/hooks';
 
 function Main() {
-  const [tableData, setTableData] = useState<any>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
+  const { liveConsentData, setLiveConsentData } = useOurGData()
+  const [isLoading, setIsLoading] = useState(liveConsentData.length === 0);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
     columns: DATATABLECOLUMNS,
-    data: tableData
+    data: liveConsentData as any
   });
-
-  const onConnect = useCallback((socket: Socket) => {
-    socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY],
-    });
-  }, []);
 
   const eventHandlers = useMemo(() => ({
     consent_averages: (data: any) => {
       if (data && data.data) {
-        setTableData(
+        setLiveConsentData(
           data.data.map((item: any) => ({
             name: capitalize(item.field_name),
             price: `$${item.average_price}`,
@@ -43,14 +38,15 @@ function Main() {
     },
   }), [isLoading]);
 
+  const onConnect = useCallback((socket: Socket) => {
+    socket.emit('consent_averages', {
+      interval: [TODAY, YESTERDAY]
+    })
+  }, [])
+
   useSocket('market_place', eventHandlers, onConnect);
-
-
-
   return (
-    <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
-      {isLoading ?
-        <Skeleton /> :
+    <div className={`overflow-auto w-full h-full max-w-[${maxWidth}]`}>
         <table {...getTableProps()} className="w-full">
           <thead>
             {headerGroups.map((headerGroup: any, index) => (
@@ -68,6 +64,7 @@ function Main() {
               </tr>
             ))}
           </thead>
+        {liveConsentData.length > 0 ? 
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any, index) => {
               prepareRow(row);
@@ -81,7 +78,7 @@ function Main() {
                     >
                       {cell.column.id === 'action' ? (
                         <Link
-                          href={`${PATHS.CHART}/${slugify(cell.row.original.name)}`}
+                          href={`${PATHS.DATA}/${slugify(cell.row.original.name)}`}
                           className="mx-auto block w-[25px] h-[25px]"
                         >
                           <Image
@@ -99,9 +96,11 @@ function Main() {
                 </tr>
               );
             })}
-          </tbody>
-        </table>
-      }
+          </tbody> :
+          !isLoading && <NoData />
+        }
+      </table>
+      {isLoading && <div className='flex justify-center mt-[200px]'><Loader className='w-10 h-10' /></div>}
     </div>
   );
 }

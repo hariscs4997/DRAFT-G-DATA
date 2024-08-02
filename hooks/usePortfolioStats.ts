@@ -2,19 +2,13 @@
 import { useLoading } from '@/state/loading/hooks';
 import { useCallback, useState } from 'react';
 import { api } from '@/config';
+import { TConsentAssetsData } from '@/state/ourGData/types';
 
 type DataField = {
   field_name: String;
   average_price: number;
   change: any;
 }[];
-
-export type TransformData = {
-  name: String;
-  price: Number;
-  quantity: number;
-  total: number;
-};
 
 export function usePortfolioStats() {
   const { isLoading, setIsLoading } = useLoading();
@@ -46,7 +40,7 @@ export function usePortfolioStats() {
     }
   }, [setIsLoading]);
 
-  const calculateTotalSum = useCallback((data: TransformData[]) => {
+  const calculateTotalSum = useCallback((data: TConsentAssetsData[]) => {
     let totalSum = 0;
     data.forEach((item) => {
       totalSum += item.total;
@@ -54,8 +48,8 @@ export function usePortfolioStats() {
     return totalSum;
   }, []);
 
-  const transformData = useCallback((dataFields: DataField, dataConsent: any): TransformData[] => {
-    const transformedData: TransformData[] = [];
+  const transformData = useCallback((dataFields: DataField, dataConsent: any): TConsentAssetsData[] => {
+    const transformedData: TConsentAssetsData[] = [];
     dataConsent.forEach((consentData: any) => {
       dataFields.forEach((fieldData) => {
         if (consentData.consent_name === fieldData.field_name && consentData.available_data_count !== 0) {
