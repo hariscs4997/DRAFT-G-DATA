@@ -61,9 +61,9 @@ function Main() {
 
 
   return (
-    <div className="flex flex-col gap-y-5 w-full h-full">
-      <div className={`overflow-x-auto w-full max-w-[${maxWidth}] min-h-[50%]`}>
-        <div className="flex justify-between items-center w-full gap-y-1">
+    <div className="w-full h-full overflow-x-auto">
+      <div className={`overflow-y-auto scrollbar-transparent w-full max-w-[${maxWidth}]`}>
+        <div className="flex justify-between items-center w-full">
           <div>
             <h1 className="text-3xl font-bold dark:text-white">{`$${sum}`}</h1>
             <p className="text-xl font-semibold dark:text-white">Total Balance</p>

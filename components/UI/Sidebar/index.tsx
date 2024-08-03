@@ -17,16 +17,21 @@ import Switch from './Switch';
 import Profile from './Profile';
 import IconButton from '../IconButton';
 
+
 function Sidebar() {
   const { width } = useWindowSize();
   const { isOpen, setIsOpen } = useSidebar();
   const containerRef = useRef<HTMLDivElement>(null);
+
   const pathname = usePathname();
   const { isAuthenticated, logoutUser, user } = useAuth();
   const handleOutsideClick = () => {
     setIsOpen(false);
   };
+
   useOutsideClick(containerRef, handleOutsideClick);
+
+
   const navItems: NAVITEMS[] = useMemo(() => {
     if (!isAuthenticated || !user) return AUTHITEMS;
     if (user.accountType === ACCOUNTTYPE.COMPANY)
@@ -48,6 +53,7 @@ function Sidebar() {
       });
     return APPITEMS;
   }, [isAuthenticated, user]);
+
   useEffect(() => {
     setIsOpen(false);
   }, [pathname, setIsOpen]);

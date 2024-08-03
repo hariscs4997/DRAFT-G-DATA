@@ -11,14 +11,18 @@ interface IProps {
   className?: string;
 }
 
+
 function Side({ children, className = '' }: IProps) {
   const { width } = useWindowSize();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
   const handleOutsideClick = () => {
     setIsOpen(false);
   };
   useOutsideClick(containerRef, handleOutsideClick);
+
+
   return (
     <>
       {width < 1024 && (
@@ -34,7 +38,7 @@ function Side({ children, className = '' }: IProps) {
       <div
         ref={containerRef}
         className={[
-          `bg-light h-[calc(100vh_-_2.5rem)] max-w-[340px] mobile:max-w-full rounded-r-lg overflow-y-auto ${
+          `bg-light h-[calc(100vh_-_2.5rem)] max-w-[340px] mobile:max-w-full rounded-r-lg overflow-y-auto scrollbar-transparent ${
             width < 1024
               ? `fixed right-0 z-20 transition-all duration-300 ${isOpen ? 'w-full pl-5 pr-3' : 'w-0 p-0'}`
               : 'w-full pl-5 pr-3'
