@@ -10,6 +10,7 @@ import ProfileChart from './ProfileChart';
 import Table from './Table';
 import { getIntervalFromSelectedValue } from '@/lib/charts';
 import { useOurGData } from '@/state/ourGData/hooks';
+import { useAuth } from '@/hooks/useAuth';
 
 
 
@@ -18,6 +19,7 @@ function Main() {
   const [isLoading, setIsLoading] = useState(consentAssetsData.length === 0)
   const [sum, setSum] = useState(0);
   const [lineChartData, setLineChartData] = useState<any>([]);
+  const { user } = useAuth()
 
   const { getPortfolioStats, calculateTotalSum, transformData } = usePortfolioStats();
 
@@ -27,7 +29,7 @@ function Main() {
     socket.emit('consent_averages', {
       interval: [TODAY, YESTERDAY],
     });
-    socket.emit('consent_line_chart_data', { interval });
+    socket.emit('get_line_chart_data', { user_id: user?.id });
 
   }, []);
 
@@ -42,8 +44,8 @@ function Main() {
       }
       setIsLoading(false)
     },
-    consent_line_chart_data: (data: any) => {
-      console.log('Received data from consent_line_chart_data -->', data.data);
+    get_line_chart_data: (data: any) => {
+      console.log('Received data from get_line_chart_data -->', data.data);
       if (data && data.data) {
         // const formattedData = TITLE && data.data[TITLE].map((item: any) => ({
         //   x: item.created_at,
@@ -61,9 +63,8 @@ function Main() {
 
 
   return (
-    <div className="w-full h-full overflow-x-auto">
-      <div className={`overflow-y-auto scrollbar-transparent w-full max-w-[${maxWidth}]`}>
-        <div className="flex justify-between items-center w-full">
+    <div className={`w-full h-full overflow-auto scrollbar-transparent max-w-[${maxWidth}]`}>
+      <div className="flex sm:flex-row flex-col justify-between sm:items-center w-full">
           <div>
             <h1 className="text-3xl font-bold dark:text-white">{`$${sum}`}</h1>
             <p className="text-xl font-semibold dark:text-white">Total Balance</p>
@@ -73,8 +74,7 @@ function Main() {
           </div>
         </div>
         <h1 className="text-3xl font-bold items-center flex mb-2 dark:text-white">Assets</h1>
-        <Table data={consentAssetsData} columns={ASSETSDATACOLUMNS} isLoadingData={isLoading} />
-      </div>
+      <Table data={consentAssetsData} columns={ASSETSDATACOLUMNS} isLoadingData={isLoading} />
     </div>
   );
 }

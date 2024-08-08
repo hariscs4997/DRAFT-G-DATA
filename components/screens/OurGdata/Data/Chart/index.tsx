@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import LineChart from '@/components/UI/LineChart';
-import CandleChart from '@/components/UI/CandleChart';
-import { DATATIMETYPESOPTIONS } from '@/constants/our_g_data';
-import { maxWidth, TODAY, transformData, YESTERDAY } from '@/constants';
+import LineChart from './LineChart';
+import CandleChart from './CandleChart';
+import { DATATIMETYPE, DATATIMETYPESOPTIONS } from '@/constants/our_g_data';
+import { maxWidth, TODAY, YESTERDAY } from '@/constants';
 import Select from '@/components/UI/Select';
 import { usePathname, useRouter } from 'next/navigation';
 import Button from '@/components/UI/Button';
@@ -16,11 +16,15 @@ import { convertToTitleCase, slugify } from '@/lib';
 import { PATHS } from '@/constants/navigation';
 import { useTheme } from '@/context/ThemeProvider';
 import { TLineChartData } from '@/types';
+import { useLoading } from '@/state/loading/hooks';
+import Skeleton from 'react-loading-skeleton';
+import moment from 'moment';
 
 
 type TProps = {
   slug: string
 }
+type TCandleChartSocketPayload = { relative_interval: "h" | 'd' | 'm' | 'y', num_of_hours?: number, consent_name: string }
 
 export default function Main({ slug }: TProps) {
 
@@ -29,76 +33,77 @@ export default function Main({ slug }: TProps) {
   const router = useRouter();
   const { theme } = useTheme();
 
-  const [selectedTimeRange, setSelectedTimeRange] = useState('1 DAY');
+  const [selectedTimeRange, setSelectedTimeRange] = useState(DATATIMETYPE.YEAR);
   const [chartType, setChartType] = useState('line');
-  const [lineChartData, setLineChartData] = useState<any>();
+  const [lineChartData, setLineChartData] = useState<TLineChartData>({
+    x: [],
+    y: [],
+  });
   const [candleChartData, setCandleChartData] = useState<any>();
-  const [consentLivePrice, setConsentLivePrice] = useState('') 
+  const [consentLivePrice, setConsentLivePrice] = useState('')
+  const { isLoading, setIsLoading } = useLoading()
 
 
-  const handleDataTypeChange = (selectedValue: string) => {
+  const handleDataTypeChange = (selectedValue: DATATIMETYPE) => {
     setSelectedTimeRange(selectedValue);
-    setLineChartData([]);
+    setLineChartData({
+      x: [],
+      y: [],
+    });
   };
+  const { interval, numOfHour, relativeInterval } = useMemo(() => getIntervalFromSelectedValue(selectedTimeRange), [selectedTimeRange])
 
 
-  const CHARTLAYOUT = useMemo(() => {
-    const plotColor = theme === 'dark' ? '#454545' : '#D9D9D9';
-    const axisColor = theme === 'light' ? '#454545' : '#D9D9D9';
-    return {
-      xaxis: {
-        title: 'Time Frame',
-        type: 'category',
-        tickmode: 'linear',
-        color: axisColor,
-      },
-      yaxis: { title: 'Y-axis', color: axisColor },
-      plot_bgcolor: plotColor,
-      paper_bgcolor: plotColor,
-      responsive: true,
-    };
-  }, [theme]);
-
-
-  const { interval, numOfHour } = useMemo(() => getIntervalFromSelectedValue(selectedTimeRange), [selectedTimeRange])
-
+  //d m y h
   const onConnect = useCallback((socket: Socket) => {
-    socket.emit('consent_line_chart_data', { interval });
-    socket.emit('consent_candle_chart_data', { relative_interval: 'h', num_of_hours: numOfHour });
+    const consentName = convertToTitleCase(slug).toUpperCase()
+    let candleChartSocketPayload: TCandleChartSocketPayload = {
+      relative_interval: relativeInterval,
+      consent_name: consentName
+    }
+    if (relativeInterval === 'h') {
+      candleChartSocketPayload = {
+        ...candleChartSocketPayload,
+        num_of_hours: numOfHour
+      }
+    }
+    socket.emit('consent_line_chart_data', {
+      interval,
+      consent_name: consentName
+    });
+
+    console.log('candleChartSocketPayload :>> ', candleChartSocketPayload);
+
+    socket.emit('consent_candle_chart_data', candleChartSocketPayload);
+
     socket.emit('consent_averages', {
       interval: [TODAY, YESTERDAY],
     });
   }, [selectedTimeRange,interval,numOfHour]);
 
-
   const eventHandlers = useMemo(() => ({
     consent_candle_chart_data: (data: any) => {
-      console.log('Recieved data from consent_candle_chart_data --> ', data);
-
-      if (data && data.data) {
-        const transformedData = data.data.map((item: { interval_start: string | number | Date; open: any; max_amount: any; min_amount: any; close: any; }) => ({
-          x: new Date(item.interval_start).toISOString().slice(11, 16),
-          open: item.open,
-          high: item.max_amount,
-          low: item.min_amount,
-          close: item.close,
-        }));
-        setCandleChartData(transformedData);
+      if (!data || !data.data) return;
+      const candleChartData = {
+        x: data.data.map((item: any) => (moment(item.start_time).format('YYYY-MM-DD'))),
+        open: data.data.map((item: any) => (item.open)),
+        high: data.data.map((item: any) => (item.max_amount)),
+        low: data.data.map((item: any) => (item.min_amount)),
+        close: data.data.map((item: any) => (item.close)),
       }
+      setCandleChartData(candleChartData);
+      if (isLoading) setIsLoading(false)
+
     },
     consent_line_chart_data: (data: any) => {
-      console.log('Received data from consent_line_chart_data -->', data.data);
-      if (data && data.data && data.data[slug!]) {
-        const formattedData: TLineChartData[] = data.data[slug!].map((item: any) => ({
-          x: item.created_at,
-          y: item.amount,
-          type: 'scatter',
-          mode: 'lines+markers',
-          marker: { color: 'red' },
-        }));
-
-        setLineChartData(transformData(formattedData));
+      const consentKey = convertToTitleCase(slug).toUpperCase()
+      if (!data || !data.data || !data.data[consentKey]) return
+      const consentLineChartData: TLineChartData = {
+        x: data.data[consentKey].map((item: any) => (item.interval_start)),
+        y: data.data[consentKey].map((item: any) => (item.average_price))
       }
+      setLineChartData((prev) => ({ ...prev, ...consentLineChartData }));
+      if (isLoading) setIsLoading(false)
     },
     consent_averages: (data: any) => {
       if (data && data.data) {
@@ -107,32 +112,27 @@ export default function Main({ slug }: TProps) {
         setConsentLivePrice(selectedConsent.average_price)
       }
     },
-  }), [slug]);
+  }), [slug, isLoading]);
 
 
   useSocket('market_place', eventHandlers, onConnect);
-
-  // useEffect(()=>{
- 
-  // },[selectedTimeRange])
-
-
+  useEffect(() => { setIsLoading(true) }, [selectedTimeRange, chartType])
 
   return (
     <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
       <p className="font-bold text-[28px] dark:text-white justify-center items-center flex mb-4">
         {convertToTitleCase(slug ?? '')}
       </p>
-      <div className="justify-between flex items-center mx-4">
+      <div className="flex sm:flex-row flex-col gap-y-3 justify-between sm:items-center mx-4">
         <p className="font-bold text-[24px] dark:text-white">
           Price : {consentLivePrice}$
         </p>
-        <div className="flex mx-4 gap-x-6">
+        <div className="flex sm:mx-4 gap-x-6">
           <Select
             value={selectedTimeRange}
             options={DATATIMETYPESOPTIONS}
-            className="w-full max-w-[200px]"
-            onClick={(item: string) => handleDataTypeChange(item)}
+            className="w-full max-w-[250px] min-w-[180px]"
+            onClick={(item) => handleDataTypeChange(item as DATATIMETYPE)}
           />
           <Select
             value={chartType}
@@ -140,21 +140,21 @@ export default function Main({ slug }: TProps) {
               { label: 'Line Chart', value: 'line' },
               { label: 'Candle Chart', value: 'candle' },
             ]}
-            className="w-full max-w-[200px]"
-            onClick={(item: string) => setChartType(item)}
+            className="w-full max-w-[250px]"
+            onClick={(item) => setChartType(item)}
           />
         </div>
       </div>
-      <div className="flex justify-center items-center my-4 w-full rounded-md relative">
-        <div className="flex justify-center items-center my-4 relative bg-chat dark:bg-gray w-[400px] max-w-fit min-h-[400px]">
-          {chartType === 'line' ? (
-            <LineChart data={lineChartData} layout={CHARTLAYOUT} />
+
+      <div className="flex justify-center items-center my-6 relative w-full">
+        {isLoading ? <Skeleton width={680} height={430} /> :
+          chartType === 'line' ? (
+            <LineChart data={lineChartData} />
           ) : (
-              <CandleChart data={candleChartData} layout={CHARTLAYOUT} />
+              <CandleChart data={candleChartData} />
           )}
         </div>
 
-      </div>
       <div className="flex justify-center items-center gap-x-4">
         <Button
           className={`w-full disabled:bg-black max-w-[250px] 

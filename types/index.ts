@@ -193,10 +193,8 @@ export type TConsentSellInfo = {
 };
 
 export type TLineChartData = {
-  created_at: string[] | undefined;
-  amount: number[] | undefined;
-  type: string;
-  marker: { color: string };
+  x: number[] | string[];
+  y: number[] | string[];
 };
 
 export type TAvailableConsentUnit = {

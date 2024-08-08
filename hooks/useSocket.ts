@@ -13,7 +13,6 @@ const useSocket = (
   onError?: (error: any) => void,
 ) => {
   const socketRef = useRef<Socket | null>(null);
-  let intervalId: NodeJS.Timeout | null = null;
 
   useEffect(() => {
     if (!socketRef.current) {
@@ -24,9 +23,6 @@ const useSocket = (
         console.log(`Connected to WebSocket server ${namespace}`);
         if (onConnect) {
           onConnect(socket);
-          intervalId = setInterval(() => {
-            onConnect(socket);
-          }, POLLING_ONE_MIN);
         }
       });
 
@@ -51,7 +47,6 @@ const useSocket = (
         disconnectSocket();
         socketRef.current = null;
       }
-      if (intervalId) clearInterval(intervalId);
     };
   }, [namespace, onConnect, onDisconnect, onError, eventHandlers]);
 

@@ -33,7 +33,7 @@ function Select({ className, options, style, value, onClick, increasePadding }: 
       ref={selectRef}
       style={style}
       className={[
-        `relative bg-chat dark:bg-[#1C1C1C] dark:text-main ${increasePadding ?? 'py-[10px]'} px-4 ${
+        `relative bg-chat dark:bg-[#1C1C1C] dark:text-main cursor-pointer ${increasePadding ?? 'py-[10px]'} px-4 ${
           isOpen ? 'rounded-md rounded-b-none' : 'rounded-md'
         } w-full`,
         className,
@@ -46,7 +46,7 @@ function Select({ className, options, style, value, onClick, increasePadding }: 
         role="button"
         tabIndex={0}
       >
-        <label className="text-primary dark:text-main  font-sans font-normal text-base max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap">
+        <label className="text-primary dark:text-main  font-sans font-normal text-base max-w-[90%] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer">
           {capitalize(value)}
         </label>
         <Image

@@ -63,11 +63,11 @@ const config: Config = {
       maxWidth: {
         sidebarItem: '297px',
       },
-    },
-    screens: {
-      mobile: { max: '767px' },
-      tablet: { max: '1280px' },
-      laptop: { max: '1499px' },
+      screens: {
+        mobile: { max: '767px' },
+        tablet: { max: '1280px' },
+        laptop: { max: '1499px' },
+      },
     },
   },
 
