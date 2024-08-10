@@ -8,9 +8,10 @@ import useSocket from '@/hooks/useSocket';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 import ProfileChart from './ProfileChart';
 import Table from './Table';
-import { getIntervalFromSelectedValue } from '@/lib/charts';
+import { aggregateDataByDate, getIntervalFromSelectedValue } from '@/lib/charts';
 import { useOurGData } from '@/state/ourGData/hooks';
 import { useAuth } from '@/hooks/useAuth';
+import { DATATIMETYPE } from '@/constants/our_g_data';
 
 
 
@@ -18,19 +19,19 @@ function Main() {
   const { consentAssetsData, setConsentAssetsData } = useOurGData()
   const [isLoading, setIsLoading] = useState(consentAssetsData.length === 0)
   const [sum, setSum] = useState(0);
-  const [lineChartData, setLineChartData] = useState<any>([]);
+  const [lineChartData, setLineChartData] = useState({});
   const { user } = useAuth()
 
   const { getPortfolioStats, calculateTotalSum, transformData } = usePortfolioStats();
 
-  const { interval } = useMemo(() => getIntervalFromSelectedValue('1 DAY'), [])
+  const { interval } = useMemo(() => getIntervalFromSelectedValue(DATATIMETYPE.YEAR), [])
 
   const onConnect = useCallback((socket: Socket) => {
     socket.emit('consent_averages', {
       interval: [TODAY, YESTERDAY],
     });
-    socket.emit('get_line_chart_data', { user_id: user?.id });
-
+    //user_id will be sent
+    socket.emit('consent_line_chart_data', { interval, });
   }, []);
 
   const eventHandlers = useMemo(() => ({
@@ -44,17 +45,11 @@ function Main() {
       }
       setIsLoading(false)
     },
-    get_line_chart_data: (data: any) => {
+    consent_line_chart_data: (data: any) => {
       console.log('Received data from get_line_chart_data -->', data.data);
       if (data && data.data) {
-        // const formattedData = TITLE && data.data[TITLE].map((item: any) => ({
-        //   x: item.created_at,
-        //   y: item.amount,
-        //   type: 'scatter',
-        //   mode: 'lines+markers',
-        //   marker: { color: 'red' },
-        // }));
-        // setLineChartData(formattedData);
+        const lineChartData = aggregateDataByDate(data.data)
+        setLineChartData(lineChartData);
       }
     },
   }), [setConsentAssetsData, setSum, transformData, calculateTotalSum, getPortfolioStats]);
@@ -69,7 +64,7 @@ function Main() {
             <h1 className="text-3xl font-bold dark:text-white">{`$${sum}`}</h1>
             <p className="text-xl font-semibold dark:text-white">Total Balance</p>
           </div>
-          <div className="min-w-[300px] mx-2 my-6">
+        <div className="max-w-[400px]">
             <ProfileChart data={lineChartData} />
           </div>
         </div>

@@ -10,9 +10,6 @@ type NAVITEM = {
 export type NAVITEMS = NAVITEM & {
   nestedItems?: NAVITEM[];
 };
-export interface ChartData {
-  [key: string]: number;
-}
 
 export enum Theme {
   DARK = 'dark',

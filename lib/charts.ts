@@ -49,3 +49,20 @@ export const getIntervalFromSelectedValue = (
     relativeInterval: 'h',
   };
 };
+
+export const aggregateDataByDate = (data: {
+  [key: string]: { interval_start: string; average_price: number; field_name: string }[];
+}) => {
+  const aggregatedData: { [key: string]: number } = {};
+  for (const category in data) {
+    const records = data[category];
+    for (const record of records) {
+      const { interval_start, average_price } = record;
+      if (!aggregatedData[interval_start]) {
+        aggregatedData[interval_start] = 0;
+      }
+      aggregatedData[interval_start] += average_price;
+    }
+  }
+  return aggregatedData;
+};

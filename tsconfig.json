@@ -30,7 +30,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "ecosystem.config.js",
-    "components/screens/OurGdata/Data/Buy/Table"
+    "env.d.ts"
   ],
   "exclude": ["node_modules"]
 }

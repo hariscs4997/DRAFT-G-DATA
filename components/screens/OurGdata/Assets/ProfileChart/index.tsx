@@ -1,12 +1,11 @@
 import React, { memo } from 'react';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
-import { ChartData } from '@/types';
 import { Chart as ChartJS, CategoryScale, LinearScale, Title, LineElement, Tooltip, PointElement } from 'chart.js';
 import { twMerge } from 'tailwind-merge';
 
 interface IProps {
-  data: ChartData;
+  data: any;
   className?: string;
 }
 ChartJS.register(ChartDataLabels, CategoryScale, LinearScale, Title, Tooltip, PointElement, LineElement);
@@ -15,18 +14,15 @@ function LineChart({ data, className }: IProps) {
   const options = {
     color: 'white',
     plugins: {
-      legend: {
-        display: false,
-      },
       datalabels: {
-        display: false, // Hide data values on the lines
+        display: false,
       },
     },
     responsive: true,
 
     scales: {
       x: {
-        display: false, // Hide X-axis labels
+        display: false, 
       },
 
       y: {
@@ -39,8 +35,6 @@ function LineChart({ data, className }: IProps) {
     {
       data: Object.values(data),
       borderColor: 'red',
-      pointHoverRadius: 0,
-      pointRadius: 0,
     },
   ];
 
@@ -50,7 +44,7 @@ function LineChart({ data, className }: IProps) {
   };
 
   return (
-    <Line options={options} data={lineChartData} redraw={true} className={twMerge("w-[100px] max-h-[120px] ml-4", className)} />
+    <Line options={options} data={lineChartData} redraw={true} className={twMerge("w-full", className)} />
   );
 }
 

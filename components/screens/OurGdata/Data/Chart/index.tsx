@@ -14,7 +14,6 @@ import useSocket from '@/hooks/useSocket';
 import { getIntervalFromSelectedValue } from '@/lib/charts';
 import { convertToTitleCase, slugify } from '@/lib';
 import { PATHS } from '@/constants/navigation';
-import { useTheme } from '@/context/ThemeProvider';
 import { TLineChartData } from '@/types';
 import { useLoading } from '@/state/loading/hooks';
 import Skeleton from 'react-loading-skeleton';
@@ -31,7 +30,6 @@ export default function Main({ slug }: TProps) {
   const { user } = useUser();
   const pathname = usePathname();
   const router = useRouter();
-  const { theme } = useTheme();
 
   const [selectedTimeRange, setSelectedTimeRange] = useState(DATATIMETYPE.YEAR);
   const [chartType, setChartType] = useState('line');
@@ -72,7 +70,6 @@ export default function Main({ slug }: TProps) {
       consent_name: consentName
     });
 
-    console.log('candleChartSocketPayload :>> ', candleChartSocketPayload);
 
     socket.emit('consent_candle_chart_data', candleChartSocketPayload);
 
