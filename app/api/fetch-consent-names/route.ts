@@ -1,6 +1,7 @@
 // app/api/fetch-consent-data/route.js
 import { NextResponse } from 'next/server';
 import { connectSocket } from '@/lib/socket';
+export const runtime = 'edge';
 
 export async function GET() {
   try {
