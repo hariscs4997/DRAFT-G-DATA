@@ -134,8 +134,8 @@ export const AVAILABLECONSENTUNITSCOLUMN: Column<Columns>[] = [
     accessor: 'checkbox' as keyof Columns,
   },
   {
-    Header: 'Name',
-    accessor: 'name' as keyof Columns,
+    Header: 'Date',
+    accessor: 'created_at' as keyof Columns,
   },
   {
     Header: 'Values',

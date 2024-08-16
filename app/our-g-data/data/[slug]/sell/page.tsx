@@ -3,10 +3,10 @@ import Container from '@/components/UI/Containers';
 import Main from '@/components/screens/OurGdata/Data/Sell';
 export const runtime = 'edge';
 
-export default function Consent() {
+export default function Consent({ params }: { params: { slug: string } }) {
   return (
     <Container type="main" className="p-12 mobile:p-2 rounded-r-lg">
-      <Main />
+      <Main slug={params.slug} />
     </Container>
   );
 }

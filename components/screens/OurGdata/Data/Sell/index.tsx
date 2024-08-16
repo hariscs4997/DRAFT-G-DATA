@@ -30,7 +30,11 @@ const ConsentUnitsSelectionPopup = dynamic(() => import('./ConsentUnitsSelection
   loading: () => <Skeleton />
 })
 
-function Main() {
+interface IProps {
+  slug: string
+}
+
+function Main({ slug }: IProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -52,16 +56,10 @@ function Main() {
   const [selectedAvailableConsentUnits, setSelectedAvailableConsentUnits] = useState<number[]>([])
 
 
-
-  const consentTitle = useMemo(() => {
-    const parts = pathname.split('/');
-    return convertToTitleCase(parts[parts.length - 2]);
-  }, [pathname]);
-
-
   const consent: any = useMemo(() => {
-    return rData[consentTitle];
-  }, [pathname, consentTitle, rData]);
+    const consentName = convertToTitleCase(slug)
+    return rData[consentName];
+  }, [slug, rData]);
 
   const closeModal = () => {
     setIsModalOpen(false)
@@ -210,10 +208,8 @@ function Main() {
 
   const eventHandlers = useMemo(() => ({
     consent_averages: (data: any) => {
-      const parts = pathname.split('/')
-      const consentSlug = parts[parts.length - 2]
       if (data && data.data) {
-        const valuePrice = data.data.find((item: any) => item.field_name === consentSlug);
+        const valuePrice = data.data.find((item: any) => item.field_name === convertToTitleCase(slug).toUpperCase());
         if (!valuePrice) return
         const averagePrice = valuePrice?.average_price || 0;
         setCurrentConsentPrice(averagePrice);

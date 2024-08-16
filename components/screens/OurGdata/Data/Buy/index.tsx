@@ -33,7 +33,7 @@ function Main() {
         user_consent_deal_id: selectedConsentId!,
         amount_offered: Number(results.amount),
       });
-      console.log('Order', response);
+      // console.log('Order', response);
       closeModal()
       onSubmit.setSubmitting(false);
     },

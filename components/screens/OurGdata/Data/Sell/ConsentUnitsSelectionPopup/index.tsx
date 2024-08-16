@@ -6,6 +6,7 @@ import Button from '@/components/UI/Button';
 import IconButton from '@/components/UI/IconButton';
 import { AVAILABLECONSENTUNITSCOLUMN } from '@/constants/consent';
 import Checkbox from '@/components/UI/Checkbox';
+import moment from 'moment';
 
 interface IProp {
     isOpen: boolean
@@ -35,6 +36,7 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose, availableConsentUnits, ha
             [consentId]: !prev[consentId]
         }))
     }
+
     return (
         <Modal
             isOpen={isOpen}
@@ -88,8 +90,8 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose, availableConsentUnits, ha
                                                     label=""
                                                 />
                                                 :
-                                                cell.column.id === 'name' ?
-                                                    <p>{row.original.personal_data_field.field_name}</p>
+                                                cell.column.id === 'created_at' ?
+                                                    <p>{moment(row.original.created_at).format("YYYY-MM-DD hh:mm:ss")}</p>
                                                     :
                                                     cell.column.id === 'values' ?
                                                         <p>{row.original.value}</p>
