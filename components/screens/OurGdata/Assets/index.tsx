@@ -31,7 +31,7 @@ function Main() {
       interval: [TODAY, YESTERDAY],
     });
     //user_id will be sent
-    socket.emit('consent_line_chart_data', { interval, });
+    socket.emit('consent_line_chart_data', { interval, user_id: user?.id });
   }, []);
 
   const eventHandlers = useMemo(() => ({
