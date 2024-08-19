@@ -55,7 +55,7 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
       {isLoadingData ?
         <Skeleton />
         :
-        <table {...getTableProps()} className="w-full">
+        <table {...getTableProps()} className="w-full relative min-h-[250px]">
           <thead>
             {headerGroups.map((headerGroup: any, index) => (
               <tr key={index}  {...headerGroup.getHeaderGroupProps()}>

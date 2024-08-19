@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic'
-import { maxWidth, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES, TODAY, YESTERDAY } from '@/constants';
 import { SELLINITIALVALUES } from '@/constants/auth';
 import { SellFormSchema } from '@/schema';
 import { usePersonalData } from '@/state/myGData/hooks';
 import { useFormik } from 'formik';
 import { convertToTitleCase } from '@/lib/index';
 import { Socket } from 'socket.io-client';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { TAvailableConsentUnit, TConsentSellInfo, TSelectedConsentForIntComp, TUserConsentDeals } from '@/types';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 import { useConsentActions } from '@/hooks/useConsentActions';
@@ -35,10 +35,9 @@ interface IProps {
 }
 
 function Main({ slug }: IProps) {
-  const pathname = usePathname();
   const router = useRouter();
 
-  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany, getAvailableConsentUnitsToSell } = useConsentActions()
+  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany, getAvailableConsentUnitsToSell, updateBuyingConsenOffer } = useConsentActions()
   const { rData } = usePersonalData();
   const { getPortfolioStatsForConsent, isLoadingConsent } = usePortfolioStats()
 
@@ -46,7 +45,7 @@ function Main({ slug }: IProps) {
   const [consentDataChanged, setConsentDataChanged] = useState(true)
   const [consentDeals, setConsentDeals] = useState<TUserConsentDeals[]>([]);
   const [consentSellInfo, setConsentSellInfo] = useState<TConsentSellInfo>()
-  const [currentConsentPrice, setCurrentConsentPrice] = useState(0);
+  const [currentConsentPrice, setCurrentConsentPrice] = useState('0');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showInterestedCompanies, setShowInterestedCompanies] = useState(false)
   const [selectedConsentForInterestedCompanies, setSelectedConsentForInterestedCompanies] = useState<TSelectedConsentForIntComp | undefined>()
@@ -115,12 +114,13 @@ function Main({ slug }: IProps) {
     setFieldValue('limitPrice', consentSellInfo.available_data_count);
     if (!values.amount) return;
     const totalValue = consentSellInfo.available_data_count * Number(values.amount)
-    setFieldValue('total', totalValue);
+    setFieldValue('total', totalValue.toFixed(PRICE_DECIMAL_PLACES));
   };
 
   const handleDeleteSellOrder = useCallback(async (orderId: number) => {
     await removeUserConsentDeal(orderId)
     setDataChanged(true)
+    setConsentDataChanged(true)
   }, [])
 
   const resetInterestedCompaniesData = () => {
@@ -163,10 +163,11 @@ function Main({ slug }: IProps) {
       seller_id: consent.user_consent_deal_id,
       amount: Number(consent.amount_offered),
       qunatity: selectedConsentForInterestedCompanies.quantity,
-      status: consent.status.toUpperCase(),
+      status: "COMPLETED",
     }
 
     await sellConsentToInterestedCompany(payload)
+    await updateBuyingConsenOffer(consent.id)
     setDataChanged(true)
     handleToggleShowInterestedCompanies()
   }, [selectedConsentForInterestedCompanies])
@@ -202,7 +203,7 @@ function Main({ slug }: IProps) {
 
   const onConnect = useCallback((socket: Socket) => {
     socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY],
+      // interval: [TODAY, YESTERDAY],
     });
   }, []);
 
@@ -212,7 +213,7 @@ function Main({ slug }: IProps) {
         const valuePrice = data.data.find((item: any) => item.field_name === convertToTitleCase(slug).toUpperCase());
         if (!valuePrice) return
         const averagePrice = valuePrice?.average_price || 0;
-        setCurrentConsentPrice(averagePrice);
+        setCurrentConsentPrice(averagePrice.toFixed(PRICE_DECIMAL_PLACES));
         setFieldValue('amount', averagePrice);
       }
     },
@@ -223,7 +224,7 @@ function Main({ slug }: IProps) {
   // update total when unit and amount changes
   useEffect(() => {
     if (!values.amount || !values.limitPrice) return
-    setFieldValue('total', Number(values.amount) * Number(values.limitPrice))
+    setFieldValue('total', (Number(values.amount) * Number(values.limitPrice)).toFixed(PRICE_DECIMAL_PLACES))
   }, [values.amount, values.limitPrice])
 
   useEffect(() => {

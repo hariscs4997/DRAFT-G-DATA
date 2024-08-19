@@ -8,7 +8,7 @@ type TProps = {
   icon?: StaticImageData;
   isParentFixed?: boolean;
 };
-function NoData({ message = undefined, icon = undefined, isParentFixed }: TProps) {
+function NoData({ message = '', icon, isParentFixed = false }: TProps) {
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,6 +18,7 @@ function NoData({ message = undefined, icon = undefined, isParentFixed }: TProps
     if (!messageContainerRef.current.parentElement) return;
     messageContainerRef.current.parentElement.classList.add('relative');
   }, [isParentFixed]);
+
   return (
     <div
       className={`flex flex-col gap-y-3 dark:text-main ${
@@ -31,7 +32,7 @@ function NoData({ message = undefined, icon = undefined, isParentFixed }: TProps
         className="w-14 h-14 object-contain dark:filter-invert(1) dark:brightness-200"
       />
       <p className="font-sans font-semibold text-primary dark:text-main text-xl text-center">
-        {message ?? 'No data to display'}
+        {message.length == 0 ? 'No data to display' : message}
       </p>
     </div>
   );

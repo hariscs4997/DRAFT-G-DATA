@@ -5,6 +5,7 @@ import { Column, useTable } from 'react-table';
 import { Columns } from '@/types';
 import NoData from '@/components/UI/NoDataMessage';
 import Loader from '@/components/UI/Loader';
+import { PRICE_DECIMAL_PLACES } from '@/constants';
 
 interface IProps {
   data: any;
@@ -21,7 +22,6 @@ function Table({ columns, data, isLoadingData }: IProps) {
 
   return (
     <>
-
         <table {...getTableProps()} className="w-full -mt-2">
           <thead>
             {headerGroups.map((headerGroup: any, index) => (
@@ -52,7 +52,10 @@ function Table({ columns, data, isLoadingData }: IProps) {
                     `}
                       >
                         {cell.column.id === 'total'
-                          ? (row.original.quantity * row.original.price)
+                          ? (row.original.quantity * row.original.price).toFixed(PRICE_DECIMAL_PLACES)
+                          :
+                          cell.column.id === 'price'
+                            ? (row.original.price).toFixed(PRICE_DECIMAL_PLACES)
                           : cell.render('Cell')}
                       </td>
                     ))}

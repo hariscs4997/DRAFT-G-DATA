@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { ASSETSDATACOLUMNS } from '@/constants/consent';
-import { maxWidth, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES } from '@/constants';
 import { Socket } from 'socket.io-client';
 import useSocket from '@/hooks/useSocket';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
@@ -28,10 +28,10 @@ function Main() {
 
   const onConnect = useCallback((socket: Socket) => {
     socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY],
+      // interval: [TODAY, YESTERDAY],
     });
     //user_id will be sent
-    socket.emit('consent_line_chart_data', { interval, user_id: user?.id });
+    socket.emit('consent_line_chart_data', { interval });
   }, []);
 
   const eventHandlers = useMemo(() => ({
@@ -46,7 +46,7 @@ function Main() {
       setIsLoading(false)
     },
     consent_line_chart_data: (data: any) => {
-      console.log('Received data from get_line_chart_data -->', data.data);
+      // console.log('Received data from get_line_chart_data -->', data.data);
       if (data && data.data) {
         const lineChartData = aggregateDataByDate(data.data)
         setLineChartData(lineChartData);
@@ -61,7 +61,7 @@ function Main() {
     <div className={`w-full h-full overflow-auto scrollbar-transparent max-w-[${maxWidth}]`}>
       <div className="flex sm:flex-row flex-col justify-between sm:items-center w-full">
           <div>
-            <h1 className="text-3xl font-bold dark:text-white">{`$${sum}`}</h1>
+          <h1 className="text-3xl font-bold dark:text-white">{`$${sum.toFixed(PRICE_DECIMAL_PLACES)}`}</h1>
             <p className="text-xl font-semibold dark:text-white">Total Balance</p>
           </div>
         <div className="max-w-[400px]">

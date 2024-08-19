@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { maxWidth, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES, TODAY, YESTERDAY } from '@/constants';
 import { DATATABLECOLUMNS } from '@/constants/consent';
 import useSocket from '@/hooks/useSocket';
 import { useTable } from 'react-table';
@@ -30,7 +30,7 @@ function Main() {
         setLiveConsentData(
           data.data.map((item: any) => ({
             name: capitalize(item.field_name),
-            price: `$${item.average_price}`,
+            price: `$${Number(item.average_price).toFixed(PRICE_DECIMAL_PLACES)}`,
           })).filter((item: any) => item.name != "Date"),
         );
         if (isLoading) setIsLoading(false);
@@ -39,9 +39,7 @@ function Main() {
   }), [isLoading]);
 
   const onConnect = useCallback((socket: Socket) => {
-    socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY]
-    })
+    socket.emit('consent_averages')
   }, [])
 
   useSocket('market_place', eventHandlers, onConnect);
@@ -88,7 +86,8 @@ function Main() {
 
                           />
                         </Link>
-                      ) : (
+                      ) :
+                        (
                         cell.render('Cell')
                       )}
                     </td>

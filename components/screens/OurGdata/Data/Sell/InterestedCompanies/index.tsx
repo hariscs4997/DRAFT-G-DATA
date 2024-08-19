@@ -5,6 +5,7 @@ import { buy_icon as sell_icon, close_icon } from '@/public/assets';
 import { INTERESTEDCOMPANYDATACOLUMNS } from '@/constants';
 import IconButton from '@/components/UI/IconButton';
 import { useTable } from 'react-table';
+import NoData from '@/components/UI/NoDataMessage';
 
 interface IProp {
   interestedCompanies: any;
@@ -20,6 +21,7 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
     columns: INTERESTEDCOMPANYDATACOLUMNS,
     data: interestedCompanies
   });
+
   return (
     <Modal
       isOpen={isShow}
@@ -36,7 +38,6 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
         <h1 className="text-2xl my-4 text-[#001F12] dark:text-white text-center">
           Interested Company
         </h1>
-        {/* <Table data={interestedCompanies} columns={INTERESTEDCOMPANYDATACOLUMNS} personalId={id} isClose={isClose} /> */}
         <table {...getTableProps()} className="w-full">
           <thead>
             {headerGroups.map((headerGroup: any) => (
@@ -54,6 +55,7 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
               </tr>
             ))}
           </thead>
+          {interestedCompanies.length > 0 ?
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any, index) => {
               prepareRow(row);
@@ -69,12 +71,12 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
 
                         <p>{row.original.offered_by && (`${row.original.offered_by.first_name} ${row?.original.offered_by.last_name}`)}
                         </p>
-
                       ) : cell.column.id === 'email' ? (
-
                         <p>{row.original.offered_by.email}</p>
-
-                      ) : cell.column.id === 'sell' ? (
+                        ) : cell.column.id === 'amount_offered' ? (
+                          <p>{row.original.amount_offered}</p>
+                        )
+                          : cell.column.id === 'sell' ? (
 
                         <IconButton className='relative w-7 h-7 mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
                           src={sell_icon}
@@ -93,7 +95,9 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
                 </tr>
               )
             })}
-          </tbody>
+            </tbody> :
+            <NoData message='No interested companies to show.' />
+          }
         </table>
       </div>
     </Modal>
