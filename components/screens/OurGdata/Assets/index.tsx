@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { ASSETSDATACOLUMNS } from '@/constants/consent';
 import { maxWidth, PRICE_DECIMAL_PLACES } from '@/constants';
 import { Socket } from 'socket.io-client';
 import useSocket from '@/hooks/useSocket';
@@ -69,7 +68,7 @@ function Main() {
           </div>
         </div>
         <h1 className="text-3xl font-bold items-center flex mb-2 dark:text-white">Assets</h1>
-      <Table data={consentAssetsData} columns={ASSETSDATACOLUMNS} isLoadingData={isLoading} />
+      <Table data={consentAssetsData} isLoadingData={isLoading} />
     </div>
   );
 }

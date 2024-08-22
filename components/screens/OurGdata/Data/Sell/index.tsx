@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic'
-import { maxWidth, PRICE_DECIMAL_PLACES, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES } from '@/constants';
 import { SELLINITIALVALUES } from '@/constants/auth';
 import { SellFormSchema } from '@/schema';
 import { usePersonalData } from '@/state/myGData/hooks';
@@ -18,6 +18,7 @@ import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import useSocket from '@/hooks/useSocket';
 import Skeleton from '@/components/UI/LazyLoader';
+import { STATUSORDER } from '@/constants/our_g_data';
 
 
 const ConsentSellOrders = dynamic(() => import('./ConsentSellOrders'), {
@@ -230,7 +231,9 @@ function Main({ slug }: IProps) {
   useEffect(() => {
     if (!dataChanged) return;
     getUserConsentsDeals().then((data) => {
-      setConsentDeals(data);
+      //sort by pending orders first
+      const sortedData = data.sort((a: any, b: any) => STATUSORDER[a.status] - STATUSORDER[b.status]);
+      setConsentDeals(sortedData);
       setDataChanged(false)
     })
   }, [dataChanged]);

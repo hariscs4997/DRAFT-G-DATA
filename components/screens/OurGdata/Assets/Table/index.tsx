@@ -1,21 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Column, useTable } from 'react-table';
-import { Columns } from '@/types';
+import { useTable } from 'react-table';
 import NoData from '@/components/UI/NoDataMessage';
 import Loader from '@/components/UI/Loader';
 import { PRICE_DECIMAL_PLACES } from '@/constants';
+import { ASSETSDATACOLUMNS } from '@/constants/consent';
 
 interface IProps {
   data: any;
-  columns: Column<Columns>[];
   isLoadingData: boolean
 }
 
-function Table({ columns, data, isLoadingData }: IProps) {
+function Table({ data, isLoadingData }: IProps) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
-    columns,
+    columns: ASSETSDATACOLUMNS,
     data,
   });
 
