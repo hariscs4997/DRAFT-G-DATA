@@ -30,7 +30,7 @@ function Main() {
       // interval: [TODAY, YESTERDAY],
     });
     //user_id will be sent
-    socket.emit('consent_line_chart_data', { interval });
+    socket.emit('consent_line_chart_data', { interval, user_id: user?.id });
   }, []);
 
   const eventHandlers = useMemo(() => ({
@@ -45,7 +45,7 @@ function Main() {
       setIsLoading(false)
     },
     consent_line_chart_data: (data: any) => {
-      // console.log('Received data from get_line_chart_data -->', data.data);
+      console.log('Received data from get_line_chart_data -->', data.data);
       if (data && data.data) {
         const lineChartData = aggregateDataByDate(data.data)
         setLineChartData(lineChartData);
