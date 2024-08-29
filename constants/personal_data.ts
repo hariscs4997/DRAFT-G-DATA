@@ -7,14 +7,6 @@ export const SOCIALLIFEOPTIONS: TDropdownOption[] = [
   { label: 'No', value: 'no' },
 ];
 export const PERSONALDATAINITIALVALUES: PersonalDataSchemaType = {
-  date: '',
-  high_temperature: 0,
-  low_temperature: 0,
-  emotional_list: [],
-  emotional_overall: '',
-  weather: '',
-  relative_finance_status: '',
-  exercise_time: 0,
   any_social_life: SOCIALLIFEOPTIONS[0].value,
 };
 

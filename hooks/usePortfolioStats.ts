@@ -40,37 +40,30 @@ export function usePortfolioStats() {
     }
   }, [setIsLoading]);
 
-  const calculateTotalSum = useCallback((data: TConsentAssetsData[]) => {
-    let totalSum = 0;
-    data.forEach((item) => {
-      totalSum += item.total;
-    });
-    return totalSum;
-  }, []);
-
-  const transformData = useCallback((dataFields: DataField, dataConsent: any): TConsentAssetsData[] => {
-    const transformedData: TConsentAssetsData[] = [];
+  const processPortfolioStats = useCallback((dataConsent: any) => {
+    const consentAssets: TConsentAssetsData[] = [];
+    let totalAssetsValue = 0;
     dataConsent.forEach((consentData: any) => {
-      dataFields.forEach((fieldData) => {
-        if (consentData.consent_name === fieldData.field_name && consentData.available_data_count !== 0) {
-          transformedData.push({
-            name: consentData.consent_name,
-            price: fieldData.average_price,
-            quantity: consentData.available_data_count,
-            total: fieldData.average_price * consentData.available_data_count,
-          });
-        }
+      consentAssets.push({
+        name: consentData.consent_name,
+        price: consentData.available_data_market_value,
+        quantity: consentData.available_data_count,
+        total: consentData.available_data_market_value * consentData.available_data_count,
       });
+      totalAssetsValue += consentData.available_data_market_value * consentData.available_data_count;
     });
-    return transformedData;
+
+    return {
+      consentAssets,
+      totalAssetsValue,
+    };
   }, []);
 
   return {
     isLoading,
     getPortfolioStatsForConsent,
     getPortfolioStats,
-    calculateTotalSum,
-    transformData,
+    processPortfolioStats,
     isLoadingConsent,
   };
 }

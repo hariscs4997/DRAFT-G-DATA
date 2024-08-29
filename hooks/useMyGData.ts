@@ -35,9 +35,7 @@ export const useMyGData = () => {
         const { data } = await api.post('api/personal_data_consents_rewards', payload);
         const newData = createTableData({ tableName: TableName.PData, data: data.data });
         setPersonalData(newData);
-        await updateMyGData();
-        await getAllConsentData();
-        await getAllPersonalData();
+        await Promise.all([updateMyGData(), getAllConsentData(), getAllPersonalData()]);
       } catch (e) {
         // console.log('e :>> ', e);
       } finally {

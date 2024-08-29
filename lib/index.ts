@@ -72,12 +72,14 @@ export const capitalize = (arg: string) => {
 
 //* create a payload for personal data post api
 export const createPayload = (personal_data: PersonalDataSchemaType) =>
-  Object.entries(personal_data).map(([key, value]) => ({
-    value: typeof value === 'object' ? `${value}` : value.toString(),
-    personal_data_field: {
-      field_name: key.toUpperCase(),
-    },
-  }));
+  Object.entries(personal_data)
+    .map(([key, value]) => ({
+      value: typeof value === 'object' ? `${value}` : value.toString(),
+      personal_data_field: {
+        field_name: key.toUpperCase(),
+      },
+    }))
+    .filter((data) => data.value.length > 0);
 
 //* create a single chat
 export const createChat = (arg: {
