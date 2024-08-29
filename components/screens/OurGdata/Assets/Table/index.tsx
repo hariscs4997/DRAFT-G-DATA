@@ -6,6 +6,7 @@ import NoData from '@/components/UI/NoDataMessage';
 import Loader from '@/components/UI/Loader';
 import { PRICE_DECIMAL_PLACES } from '@/constants';
 import { ASSETSDATACOLUMNS } from '@/constants/consent';
+import { convertToTitleCase } from '@/lib';
 
 interface IProps {
   data: any;
@@ -50,12 +51,14 @@ function Table({ data, isLoadingData }: IProps) {
                         className={`border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center
                     `}
                       >
-                        {cell.column.id === 'total'
-                          ? (row.original.quantity * row.original.price).toFixed(PRICE_DECIMAL_PLACES)
-                          :
+                        {cell.column.id === 'name' ?
+                          convertToTitleCase(row.original.name) :
                           cell.column.id === 'price'
                             ? (row.original.price).toFixed(PRICE_DECIMAL_PLACES)
-                          : cell.render('Cell')}
+                            : cell.column.id === 'total'
+                              ? (row.original.quantity * row.original.price).toFixed(PRICE_DECIMAL_PLACES)
+                              : cell.render('Cell')
+                        }
                       </td>
                     ))}
                   </tr>

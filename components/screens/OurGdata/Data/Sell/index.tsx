@@ -244,7 +244,7 @@ function Main({ slug }: IProps) {
       setConsentSellInfo(data[0])
     })
     getAvailableConsentUnitsToSell(consent.id).then(data => {
-      console.log(data)
+      // console.log(data)
       setAvailableConsentUnits(data.filter((consentUnit: any) => consentUnit.value.length > 0))
       const availableUnitsIDs = data.map((unit: any) => unit.id)
       setSelectedAvailableConsentUnits(availableUnitsIDs)

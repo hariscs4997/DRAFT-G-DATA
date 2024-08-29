@@ -10,6 +10,7 @@ import IconButton from '@/components/UI/IconButton';
 import { TUserConsentDeals } from '@/types';
 import Skeleton from '@/components/UI/LazyLoader';
 import NoData from '@/components/UI/NoDataMessage';
+import { convertToTitleCase } from '@/lib';
 
 interface IProps {
   isLoadingData: boolean;
@@ -88,7 +89,7 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
                       {cell.column.id === 'name' ? (
                         <p>
                           {row.original ?
-                            row.original.personal_data_field.field_name
+                            convertToTitleCase(row.original.personal_data_field.field_name)
                             : null}
                         </p>
                       ) :
