@@ -1,4 +1,6 @@
-on: [push]: branches: [setup/cloudflare/integration]
+on:
+  push:
+    branches: [setup/cloudflare-integration]
 jobs: #can have multiple jobs
   deploy: #name of the job (could be anything)
     runs-on: ubuntu-latest #environment in which the job will run
