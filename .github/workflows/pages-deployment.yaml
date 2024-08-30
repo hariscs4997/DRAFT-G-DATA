@@ -16,6 +16,8 @@ jobs: #can have multiple jobs
 
         #Step 2 (Run your project's build step)
       - name: Build
+        env:
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
         run: npm install && npm run build
 
 
