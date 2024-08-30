@@ -4,9 +4,11 @@ on:
 jobs: #can have multiple jobs
   deploy: #name of the job (could be anything)
     runs-on: ubuntu-latest #environment in which the job will run
+    
     permissions:
       contents: read
       deployments: write
+    
     name: Deploy to Cloudflare Pages
     steps: # defines a series of steps to be executed in the job. Each step can either use an existing GitHub Action (uses) or run a command directly (run)
 
@@ -14,7 +16,13 @@ jobs: #can have multiple jobs
       - name: Checkout #name of the step (could be anything)
         uses: actions/checkout@v3 # The checkout action clones your repository so that the runner has access to your code.
 
-        #Step 2 (Run your project's build step)
+       #Step 2 (Install Node.js)
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'latest'  # Use the latest version of Node.js
+
+        #Step 3 (Run your project's build step)
       - name: Build
         env:
           NEXT_PUBLIC_BASE_URL: ${{ vars.NEXT_PUBLIC_BASE_URL }}
@@ -23,12 +31,10 @@ jobs: #can have multiple jobs
           NEXT_PUBLIC_OPEN_WEATHER_API_KEY: ${{ secrets.NEXT_PUBLIC_OPEN_WEATHER_API_KEY }}
         run: npm install && npm run build
 
+      - name: Install Wrangler
+        run: npm install -g wrangler
 
-      - name: Publish
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: g-datalabs
-          directory: .next 
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to Cloudflare Pages
+        run: wrangler pages deploy ./public --project-name g-datalabs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
