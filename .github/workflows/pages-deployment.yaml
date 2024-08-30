@@ -17,7 +17,10 @@ jobs: #can have multiple jobs
         #Step 2 (Run your project's build step)
       - name: Build
         env:
-          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+          NEXT_PUBLIC_BASE_URL: ${{ vars.NEXT_PUBLIC_BASE_URL }}
+          NEXT_PUBLIC_NODE_ENV: ${{ vars.NEXT_PUBLIC_NODE_ENV }} 
+          NEXT_PUBLIC_REACT_APP_BASE_URL: ${{ vars.NEXT_PUBLIC_REACT_APP_BASE_URL }} 
+          NEXT_PUBLIC_OPEN_WEATHER_API_KEY: ${{ secrets.NEXT_PUBLIC_OPEN_WEATHER_API_KEY }}
         run: npm install && npm run build
 
 
