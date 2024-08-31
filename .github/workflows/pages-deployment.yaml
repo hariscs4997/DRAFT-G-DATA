@@ -20,7 +20,7 @@ jobs: #can have multiple jobs
       - name: Set Up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'latest'  # Use the latest version of Node.js
+          node-version: '20'  # Use the latest version of Node.js
 
         #Step 3 (Run your project's build step)
       - name: Build
