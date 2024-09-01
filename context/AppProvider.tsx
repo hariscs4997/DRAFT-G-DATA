@@ -67,7 +67,7 @@ function AppProvider({ children }: IProps) {
       const consentTableData = createTableData({ tableName: TableName.CData, data: data.data });
       setCData(consentTableData);
     } catch (e) {
-      // console.log('e', e);
+      console.log('e', e);
     }
   }, [setRData, setCData]);
   const getAllCompanyConsentData = useCallback(async () => {

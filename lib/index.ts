@@ -76,7 +76,7 @@ export const createPayload = (personal_data: PersonalDataSchemaType) =>
     .map(([key, value]) => ({
       value: typeof value === 'object' ? `${value}` : value.toString(),
       personal_data_field: {
-        field_name: key.toUpperCase(),
+        field_name: convertToTitleCase(key).toUpperCase(),
       },
     }))
     .filter((data) => data.value.length > 0);
@@ -105,8 +105,21 @@ export const createChat = (arg: {
   } as Chat;
 };
 
-//* create table data
+//* consent definitions and unit
+const _getConsentDefAndUnit = (fieldName: string) => {
+  const fieldNameWithUnderscore = fieldName.replaceAll(/[\s+]+/g, '_').toLowerCase();
+  const initialResponse = {
+    unit: '',
+    definition: '',
+  };
+  if (!DESCRIPTIONANDUNITOFVARIABLES[fieldNameWithUnderscore]) return initialResponse;
+  return {
+    unit: DESCRIPTIONANDUNITOFVARIABLES[fieldNameWithUnderscore].unit,
+    definition: DESCRIPTIONANDUNITOFVARIABLES[fieldNameWithUnderscore].definition,
+  };
+};
 
+//* create table data
 export const createTableData = (arg: { tableName: string; data: PersonalDataType[] | any }) => {
   const { tableName, data } = arg;
   const result: Data = {};
@@ -142,10 +155,11 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   if (tableName === TableName.RData) {
     for (const d of data) {
       const fieldName = capitalize(d.field_name.toLowerCase().replaceAll('_', ' '));
+      const { unit } = _getConsentDefAndUnit(d.field_name);
       result[fieldName] = {
         ...result[fieldName],
         Consent: d.consents_to_sell.toString().toUpperCase(),
-        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].unit,
+        Unit: unit,
         PDefinedValue: d.demanded_reward_value,
         OtherCompValue: '0.0',
         id: d.id,
@@ -155,11 +169,13 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   if (tableName === TableName.CData) {
     for (const d of data) {
       const fieldName = capitalize(d.field_name.toLowerCase().replaceAll('_', ' '));
+
+      const { unit, definition } = _getConsentDefAndUnit(d.field_name);
       result[fieldName] = {
         ...result[fieldName],
         Consent: d.consents_to_sell.toString().toUpperCase(),
-        Definition: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].definition,
-        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].unit,
+        Definition: definition,
+        Unit: unit,
         Companies: createCompaniesDropdown(d.company_consent),
         Use: createCompanyToFieldMapping({ fieldName: 'usage', data: d.company_consent }),
         Threshold: createCompanyToFieldMapping({ fieldName: 'threshold', data: d.company_consent }),
@@ -170,14 +186,13 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   }
   if (tableName === TableName.CompData) {
     for (const d of data) {
+      const { unit, definition } = _getConsentDefAndUnit(d.personal_data_field.field_name);
+
       result[d.personal_data_field.field_name] = {
         ...result[d.personal_data_field.field_name],
         Consent: d.consents_to_buy.toString().toUpperCase(),
-        Definition:
-          DESCRIPTIONANDUNITOFVARIABLES[d.personal_data_field.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]
-            .definition,
-        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.personal_data_field.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]
-          .unit,
+        Definition: definition,
+        Unit: unit,
         Use: d.usage,
         Pricing: d.demanded_reward_value,
         fieldName: d.personal_data_field.field_name,
@@ -331,3 +346,5 @@ export const slugify = (path: string) => {
   }
   return path.toLowerCase().replaceAll(/\s+/g, '-');
 };
+
+

@@ -17,6 +17,7 @@ import { PATHS } from '@/constants/navigation';
 import { generateAvatar } from '@/lib';
 import { useChats } from '@/state/chats/hooks';
 import { ConfirmPasswordFormSchemaType, ResetPasswordFormSchemaType } from '@/schema';
+import { persistor } from '@/state/store';
 
 export const useAuth = () => {
   const { isLoading, setIsLoading } = useLoading();
@@ -167,6 +168,11 @@ export const useAuth = () => {
   );
   const logoutUser = useCallback(() => {
     setUser({ user: undefined, isAuthenticated: false });
+    //reset persist state
+    persistor.pause();
+    persistor.flush().then(() => {
+      return persistor.purge();
+    });
     deleteChats();
     toast.success('Logout Successful.');
     router.replace(PATHS.LOGIN);
