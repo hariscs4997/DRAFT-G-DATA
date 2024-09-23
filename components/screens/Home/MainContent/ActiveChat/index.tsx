@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import Typed from 'react-typed';
+import { ReactTyped as Typed } from 'react-typed';
 import { StaticImageData } from 'next/image';
 import logo from '@/public/images/logo.png';
 import logo_dark from '@/public/images/logo-dark.png';
