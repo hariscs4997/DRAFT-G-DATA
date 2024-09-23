@@ -107,12 +107,12 @@ export const DESCRIPTIONANDUNITOFVARIABLES: {
   },
   camera_recording: {
     definition: 'video recording from device webcam where face and or body are clearly visible',
-    unit: ' Price per second of device webcam recording where face\body are clearly visible',
+    unit: ' Price per second of device webcam recording where face or body are clearly visible',
   },
   screen_camera_recording: {
     definition:
       'simultaneous combination of video recording of on-screen device activity and video recording from device webcam where face and or body are clearly visible',
-    unit: 'Price per second of device screen + webcam recording where face\body are clearly visible',
+    unit: 'Price per second of device screen + webcam recording where face or body are clearly visible',
   },
   microphone_audio_recording: {
     definition: 'audio recording from device microphone with clearly audible feedback',
@@ -126,6 +126,10 @@ export const DESCRIPTIONANDUNITOFVARIABLES: {
     definition:
       'simultaneous combination of audio recording from device microphone and audio recording from device system audio with clearly audible feedback',
     unit: ' Price per second of device microphone and system audio recording',
+  },
+  history: {
+    definition: '',
+    unit: 'Price per input-output pair in history of interaction with AI model',
   },
 };
 
