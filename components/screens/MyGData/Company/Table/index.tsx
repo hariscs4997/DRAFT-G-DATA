@@ -1,12 +1,14 @@
 import { Column, useTable } from 'react-table';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Columns, UpdateCompanyConsentPayload } from '@/types';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Columns, TOptions, UpdateCompanyConsentPayload } from '@/types';
 import Actions from '@/components/screens/MyGData/Actions';
 import Input from '@/components/screens/MyGData/components/Input';
-import Textarea from '@/components/screens/MyGData/components/Textarea';
 import { createCompanyState } from '@/lib';
 import { UpdateConsentCompanyType } from '@/state/myGData/types';
-
+import { CONSENTUSECASES } from '@/constants/consent';
+import MultiSelect from '@/components/UI/MultiSelect';
+import { MultiValue } from 'react-select';
+import _ from 'lodash'
 interface IProps {
   data: any;
   columns: Column<Columns>[];
@@ -22,8 +24,10 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
   const [values, setValues] = useState<{
     [key: string]: UpdateConsentCompanyType;
   }>({});
-
   const [recordID, setRecordID] = useState('');
+  //using refs because not getting updated values in debounce
+  const recordIDRef = useRef(recordID);
+  const valuesRef = useRef(values); 
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
@@ -40,8 +44,22 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
       },
     }));
     setRecordID(fieldName);
+    handleConsentRewardsUpdateDebounced()
+
   };
 
+  const handleSelectUseCase = (newValue: MultiValue<TOptions>, fieldName: string) => {
+    setValues((prev) => ({
+      ...prev,
+      [fieldName]: {
+        ...prev[fieldName],
+        ['use']: newValue,
+      },
+    }));
+    setRecordID(fieldName);
+    handleConsentRewardsUpdateDebounced()
+
+  }
   const handleConsetUpdate = useCallback(
     (name: string) => {
       const recordConsent = values[name].consents_to_buy;
@@ -56,40 +74,40 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
     },
     [updateConsentRewards, values],
   );
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     if (!recordID) return;
-  //     updateConsentRewards([
-  //       {
-  //         demanded_reward_value: Number(values[recordID].pricing),
-  //         usage: values[recordID].use,
-  //         threshold: Number(values[recordID].threshold),
-  //         personal_data_field: {
-  //           field_name: recordID,
-  //         },
-  //       },
-  //     ]);
-  //     setRecordID('');
-  //   }, 2000);
 
-  //   return () => clearTimeout(timeout);
-  // }, [values, recordID, updateConsentRewards]);
-  const handleButtonClick = () => {
-    if (!recordID) return;
+  //call the update function (server) when use cases are updated
+  const handleConsentRewardsUpdateDebounced = useCallback(
+    _.debounce(() => {
+      handleConsentRewardsUpdate();
+    }, 1000),
+    []
+  );
+  const handleConsentRewardsUpdate = () => {
+    const latestRecordID = recordIDRef.current;
+    const latestValues = valuesRef.current;
+    if (!latestRecordID) return;
     updateConsentRewards([
       {
-        demanded_reward_value: Number(values[recordID].pricing),
-        usage: values[recordID].use,
-        threshold: Number(values[recordID].threshold),
+        demanded_reward_value: Number(latestValues[latestRecordID].pricing),
+        usage: latestValues[latestRecordID].use.map((usecase) => usecase.value).join(','),
+        threshold: Number(latestValues[latestRecordID].threshold),
         personal_data_field: {
-          field_name: recordID,
+          field_name: latestRecordID,
         },
       },
     ]);
   };
   useEffect(() => {
-    setValues(createCompanyState(data));
+    const { result } = createCompanyState(data)
+    setValues(result);
   }, [data]);
+
+  // Update refs whenever recordID or values change
+  useEffect(() => {
+    recordIDRef.current = recordID;
+    valuesRef.current = values;
+  }, [recordID, values]);
+
 
   return (
     <table {...getTableProps()} className="w-full">
@@ -121,6 +139,7 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
                   className={`border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 bg-active dark:bg-darkChat text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center 
                   ${cellIndex === row.cells.length - 1 && 'hidden'}
                   ${(cellIndex === 1 || cellIndex === 2) && 'min-w-[450px]'}
+                  ${cell.column.id === 'Use' && 'max-w-[250px]'}
                   `}
                 >
                   {(cellIndex === 0 || cellIndex === 1 || cellIndex === 2) && cell.render('Cell')}
@@ -133,14 +152,16 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
                     />
                   )}
                   {cell.column.id === 'Use' && (
-                    <Textarea
+                    <MultiSelect
                       name={`Use-${row.values.fieldName}`}
-                      readOnly={row.values.Consent === 'FALSE'}
-                      value={values[row.values.fieldName] ? values[row.values.fieldName].use : ''}
-                      onChange={(e) => handleChange(e, 'use')}
-                      className="min-w-[200px]"
-                      onClick={() => {}}
+                      options={CONSENTUSECASES}
+                      onChange={
+                        (newValue) => handleSelectUseCase(newValue, row.values.fieldName)
+                      }
+                      values={values[row.values.fieldName] ? values[row.values.fieldName].use : []}
+                      isDisabled={row.values.Consent === 'FALSE'}
                     />
+
                   )}
                   {cell.column.id === 'Pricing' && (
                     <Input
@@ -152,7 +173,6 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
                       value={values[row.values.fieldName] ? values[row.values.fieldName].pricing : ''}
                       onChange={(e) => handleChange(e, 'pricing')}
                       className="min-w-[160px]"
-                      onclick={handleButtonClick}
                     />
                   )}
                   {cell.column.id === 'Threshold' && (
@@ -164,7 +184,6 @@ function Table({ columns, data, updateConsentRewards }: IProps) {
                       value={values[row.values.fieldName] ? values[row.values.fieldName].threshold : ''}
                       onChange={(e) => handleChange(e, 'threshold')}
                       className="min-w-[160px]"
-                      onclick={handleButtonClick}
                     />
                   )}
                 </td>

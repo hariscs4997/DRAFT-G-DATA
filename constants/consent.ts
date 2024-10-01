@@ -1,5 +1,5 @@
 import { Column } from 'react-table';
-import { Columns } from '@/types';
+import { Columns, TOptions } from '@/types';
 import { DESCRIPTIONANDUNITOFVARIABLES } from '.';
 
 export const CONSENTTABLECOLUMNS: Column<Columns>[] = [
@@ -369,3 +369,56 @@ export const CONSENTTABLEDATA = {
     id: null,
   },
 };
+
+export const CONSENTUSECASES: TOptions[] = [
+  {
+    value: 'Advertising',
+    label: 'Advertising',
+  },
+  {
+    value: 'Personalization',
+    label: 'Personalization',
+  },
+  {
+    value: 'Research',
+    label: 'Research',
+  },
+
+  {
+    value: 'AI Model Training',
+    label: 'AI Model Training',
+  },
+  {
+    value: 'Healthcare',
+    label: 'Healthcare',
+  },
+  {
+    value: 'AI Generated Text',
+    label: 'AI Generated Text',
+  },
+  {
+    value: 'AI Generated Audio',
+    label: 'AI Generated Audio',
+  },
+  {
+    value: 'AI Generated Images',
+    label: 'AI Generated Images',
+  },
+  {
+    value: 'AI Generated Videos',
+    label: 'AI Generated Videos',
+  },
+  {
+    value: 'AI Generated Actions',
+    label: 'AI Generated Actions',
+  },
+  {
+    value: 'AI Generated Worlds',
+    label: 'AI Generated Worlds',
+  },
+
+  {
+    value: 'Product Development',
+    label: 'Product Development',
+  },
+];

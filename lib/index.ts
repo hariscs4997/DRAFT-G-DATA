@@ -9,12 +9,15 @@ import {
   ChatHistoryResponseType,
   ScreenDataResponseType,
   RecentChatHistoryResponseType,
+  TOptions,
 } from '@/types';
 import { THistory, Chat, ChatHistory, TGroupedChatHistory } from '@/state/chats/types';
 import { PersonalDataSchemaType } from '@/schema';
 import { Data, ScreenDataType, UpdateConsentCompanyType } from '@/state/myGData/types';
 import { DESCRIPTIONANDUNITOFVARIABLES } from '@/constants';
 import { createCompaniesDropdown, createCompanyToFieldMapping } from './consent';
+import { MultiValue } from 'react-select';
+import { CONSENTUSECASES } from '@/constants/consent';
 
 const addToGroup = (categorizedMessagesMap: TGroupedChatHistory, groupName: string, message: THistory) => {
   if (!categorizedMessagesMap[groupName]) {
@@ -179,6 +182,7 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
         Use: d.usage,
         Pricing: d.demanded_reward_value,
         fieldName: d.personal_data_field.field_name,
+        Threshold: d.threshold,
       };
     }
   }
@@ -212,15 +216,22 @@ export const createCompanyState = (data: any) => {
   const result: {
     [key: string]: UpdateConsentCompanyType;
   } = {};
+
   for (const d of data) {
     result[d.fieldName] = {
       consents_to_buy: d.Consent === 'TRUE',
-      use: d.Use,
+      use: d.Use
+        ? d.Use.split(',')
+            .filter((usecase: string) => {
+              return CONSENTUSECASES.some((consent) => consent.value === usecase);
+            })
+            .map((usecase: string) => ({ label: usecase, value: usecase }))
+        : [],
       pricing: d.Pricing,
       threshold: d.Threshold,
     };
   }
-  return result;
+  return { result };
 };
 
 //* create history table data

@@ -24,6 +24,7 @@ function Input({
   currency = '$',
   isMonetaryInput = false,
   onclick,
+  onBlur
 }: IProps) {
   return (
     <div
@@ -45,6 +46,7 @@ function Input({
         id={name}
         type={type || 'number'}
         value={value}
+        onBlur={onBlur}
         onChange={onChange}
         className="bg-chat dark:bg-[#727271] py-3 px-6 rounded-sm text-white font-sans font-medium text-xl focus:outline-none w-full max-w-[100px]"
       />
