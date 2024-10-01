@@ -1,3 +1,5 @@
+import { TOptions } from '@/types';
+import { MultiValue } from 'react-select';
 //types.ts
 export type Data = {
   [key: string]: {
@@ -27,7 +29,7 @@ export type UpdateConsentRewardType = {
 };
 
 export type UpdateConsentCompanyType = {
-  use: string;
+  use: MultiValue<TOptions>;
   threshold: string;
   pricing: string;
   consents_to_buy: boolean;

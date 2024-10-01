@@ -9,12 +9,15 @@ import {
   ChatHistoryResponseType,
   ScreenDataResponseType,
   RecentChatHistoryResponseType,
+  TOptions,
 } from '@/types';
 import { THistory, Chat, ChatHistory, TGroupedChatHistory } from '@/state/chats/types';
 import { PersonalDataSchemaType } from '@/schema';
 import { Data, ScreenDataType, UpdateConsentCompanyType } from '@/state/myGData/types';
 import { DESCRIPTIONANDUNITOFVARIABLES } from '@/constants';
 import { createCompaniesDropdown, createCompanyToFieldMapping } from './consent';
+import { MultiValue } from 'react-select';
+import { CONSENTUSECASES } from '@/constants/consent';
 
 const addToGroup = (categorizedMessagesMap: TGroupedChatHistory, groupName: string, message: THistory) => {
   if (!categorizedMessagesMap[groupName]) {
@@ -72,14 +75,12 @@ export const capitalize = (arg: string) => {
 
 //* create a payload for personal data post api
 export const createPayload = (personal_data: PersonalDataSchemaType) =>
-  Object.entries(personal_data)
-    .map(([key, value]) => ({
-      value: typeof value === 'object' ? `${value}` : value.toString(),
-      personal_data_field: {
-        field_name: convertToTitleCase(key).toUpperCase(),
-      },
-    }))
-    .filter((data) => data.value.length > 0);
+  Object.entries(personal_data).map(([key, value]) => ({
+    value: typeof value === 'object' ? `${value}` : value.toString(),
+    personal_data_field: {
+      field_name: key.toUpperCase(),
+    },
+  }));
 
 //* create a single chat
 export const createChat = (arg: {
@@ -105,21 +106,8 @@ export const createChat = (arg: {
   } as Chat;
 };
 
-//* consent definitions and unit
-const _getConsentDefAndUnit = (fieldName: string) => {
-  const fieldNameWithUnderscore = fieldName.replaceAll(/[\s+]+/g, '_').toLowerCase();
-  const initialResponse = {
-    unit: '',
-    definition: '',
-  };
-  if (!DESCRIPTIONANDUNITOFVARIABLES[fieldNameWithUnderscore]) return initialResponse;
-  return {
-    unit: DESCRIPTIONANDUNITOFVARIABLES[fieldNameWithUnderscore].unit,
-    definition: DESCRIPTIONANDUNITOFVARIABLES[fieldNameWithUnderscore].definition,
-  };
-};
-
 //* create table data
+
 export const createTableData = (arg: { tableName: string; data: PersonalDataType[] | any }) => {
   const { tableName, data } = arg;
   const result: Data = {};
@@ -155,11 +143,10 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   if (tableName === TableName.RData) {
     for (const d of data) {
       const fieldName = capitalize(d.field_name.toLowerCase().replaceAll('_', ' '));
-      const { unit } = _getConsentDefAndUnit(d.field_name);
       result[fieldName] = {
         ...result[fieldName],
         Consent: d.consents_to_sell.toString().toUpperCase(),
-        Unit: unit,
+        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].unit,
         PDefinedValue: d.demanded_reward_value,
         OtherCompValue: '0.0',
         id: d.id,
@@ -169,13 +156,11 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   if (tableName === TableName.CData) {
     for (const d of data) {
       const fieldName = capitalize(d.field_name.toLowerCase().replaceAll('_', ' '));
-
-      const { unit, definition } = _getConsentDefAndUnit(d.field_name);
       result[fieldName] = {
         ...result[fieldName],
         Consent: d.consents_to_sell.toString().toUpperCase(),
-        Definition: definition,
-        Unit: unit,
+        Definition: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].definition,
+        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].unit,
         Companies: createCompaniesDropdown(d.company_consent),
         Use: createCompanyToFieldMapping({ fieldName: 'usage', data: d.company_consent }),
         Threshold: createCompanyToFieldMapping({ fieldName: 'threshold', data: d.company_consent }),
@@ -186,16 +171,18 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   }
   if (tableName === TableName.CompData) {
     for (const d of data) {
-      const { unit, definition } = _getConsentDefAndUnit(d.personal_data_field.field_name);
-
       result[d.personal_data_field.field_name] = {
         ...result[d.personal_data_field.field_name],
         Consent: d.consents_to_buy.toString().toUpperCase(),
-        Definition: definition,
-        Unit: unit,
+        Definition:
+          DESCRIPTIONANDUNITOFVARIABLES[d.personal_data_field.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]
+            .definition,
+        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.personal_data_field.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]
+          .unit,
         Use: d.usage,
         Pricing: d.demanded_reward_value,
         fieldName: d.personal_data_field.field_name,
+        Threshold: d.threshold,
       };
     }
   }
@@ -229,15 +216,22 @@ export const createCompanyState = (data: any) => {
   const result: {
     [key: string]: UpdateConsentCompanyType;
   } = {};
+
   for (const d of data) {
     result[d.fieldName] = {
       consents_to_buy: d.Consent === 'TRUE',
-      use: d.Use,
+      use: d.Use
+        ? d.Use.split(',')
+            .filter((usecase: string) => {
+              return CONSENTUSECASES.some((consent) => consent.value === usecase);
+            })
+            .map((usecase: string) => ({ label: usecase, value: usecase }))
+        : [],
       pricing: d.Pricing,
       threshold: d.Threshold,
     };
   }
-  return result;
+  return { result };
 };
 
 //* create history table data
@@ -346,5 +340,3 @@ export const slugify = (path: string) => {
   }
   return path.toLowerCase().replaceAll(/\s+/g, '-');
 };
-
-

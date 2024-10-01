@@ -210,3 +210,7 @@ export type TAvailableConsentUnit = {
   sold: boolean;
   value: string;
 };
+export type TOptions = {
+  value: string;
+  label: string;
+};
