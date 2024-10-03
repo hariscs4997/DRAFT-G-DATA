@@ -64,10 +64,11 @@ function AppProvider({ children }: IProps) {
       const { data } = await api.get('api/user_consents_rewards');
       const rData = createTableData({ tableName: TableName.RData, data: data.data });
       setRData(rData);
-      const consentTableData = createTableData({ tableName: TableName.CData, data: data.data });
+      const consentTableData = createTableData({ tableName: TableName.CData, data: data.data })
       setCData(consentTableData);
+
     } catch (e) {
-      // console.log('e', e);
+      console.log('e', e);
     }
   }, [setRData, setCData]);
   const getAllCompanyConsentData = useCallback(async () => {

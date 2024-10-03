@@ -16,7 +16,6 @@ import { PersonalDataSchemaType } from '@/schema';
 import { Data, ScreenDataType, UpdateConsentCompanyType } from '@/state/myGData/types';
 import { DESCRIPTIONANDUNITOFVARIABLES } from '@/constants';
 import { createCompaniesDropdown, createCompanyToFieldMapping } from './consent';
-import { MultiValue } from 'react-select';
 import { CONSENTUSECASES } from '@/constants/consent';
 
 const addToGroup = (categorizedMessagesMap: TGroupedChatHistory, groupName: string, message: THistory) => {
@@ -146,7 +145,7 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
       result[fieldName] = {
         ...result[fieldName],
         Consent: d.consents_to_sell.toString().toUpperCase(),
-        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].unit,
+        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]?.unit,
         PDefinedValue: d.demanded_reward_value,
         OtherCompValue: '0.0',
         id: d.id,
@@ -159,8 +158,8 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
       result[fieldName] = {
         ...result[fieldName],
         Consent: d.consents_to_sell.toString().toUpperCase(),
-        Definition: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].definition,
-        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()].unit,
+        Definition: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]?.definition,
+        Unit: DESCRIPTIONANDUNITOFVARIABLES[d.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]?.unit,
         Companies: createCompaniesDropdown(d.company_consent),
         Use: createCompanyToFieldMapping({ fieldName: 'usage', data: d.company_consent }),
         Threshold: createCompanyToFieldMapping({ fieldName: 'threshold', data: d.company_consent }),
@@ -176,9 +175,9 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
         Consent: d.consents_to_buy.toString().toUpperCase(),
         Definition:
           DESCRIPTIONANDUNITOFVARIABLES[d.personal_data_field.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]
-            .definition,
+            ?.definition,
         Unit: DESCRIPTIONANDUNITOFVARIABLES[d.personal_data_field.field_name.replaceAll(/[\s+]+/g, '_').toLowerCase()]
-          .unit,
+          ?.unit,
         Use: d.usage,
         Pricing: d.demanded_reward_value,
         fieldName: d.personal_data_field.field_name,

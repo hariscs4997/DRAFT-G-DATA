@@ -127,6 +127,10 @@ export const DESCRIPTIONANDUNITOFVARIABLES: {
       'simultaneous combination of audio recording from device microphone and audio recording from device system audio with clearly audible feedback',
     unit: ' Price per second of device microphone and system audio recording',
   },
+  history: {
+    definition: '',
+    unit: 'Price per input-output pair in history of interaction with AI model',
+  },
 };
 
 export const maxWidth = '1450px';
