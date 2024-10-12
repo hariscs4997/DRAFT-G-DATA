@@ -17,7 +17,7 @@ function Logo() {
           <Image unoptimized src="/images/logo-dark.png" alt="logo" fill className="object-contain " />
         )}
       </div>
-      <h3 className="text-[#575757] font-sans laptop:text-2xl text-3xl font-bold dark:text-primary">G-DataLabs</h3>
+      <h3 className="text-[#575757] font-sans laptop:text-2xl text-3xl font-bold dark:text-primary">G-Data Labs</h3>
     </Link>
   );
 }

@@ -128,7 +128,7 @@ export const DESCRIPTIONANDUNITOFVARIABLES: {
     unit: ' Price per second of device microphone and system audio recording',
   },
   history: {
-    definition: '',
+    definition: 'Record of interaction between engager input and ai output',
     unit: 'Price per input-output pair in history of interaction with AI model',
   },
 };
