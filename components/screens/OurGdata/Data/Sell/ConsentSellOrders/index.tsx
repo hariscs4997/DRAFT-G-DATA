@@ -10,6 +10,7 @@ import IconButton from '@/components/UI/IconButton';
 import { TUserConsentDeals } from '@/types';
 import Skeleton from '@/components/UI/LazyLoader';
 import NoData from '@/components/UI/NoDataMessage';
+import { convertToTitleCase } from '@/lib';
 
 interface IProps {
   isLoadingData: boolean;
@@ -55,7 +56,7 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
       {isLoadingData ?
         <Skeleton />
         :
-        <table {...getTableProps()} className="w-full">
+        <table {...getTableProps()} className="w-full relative min-h-[250px]">
           <thead>
             {headerGroups.map((headerGroup: any, index) => (
               <tr key={index}  {...headerGroup.getHeaderGroupProps()}>
@@ -73,55 +74,55 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
             ))}
           </thead>
           {data.length > 0 ?
-          <tbody {...getTableBodyProps()}>
-            {rows.map((row: any, index) => {
-              prepareRow(row);
-              return (
-                <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
-                  {row.cells.map((cell: any) => (
-                    <td
-                      key={cell.id}
-                      {...cell.getCellProps()}
-                      className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
-                    >
+            <tbody {...getTableBodyProps()}>
+              {rows.map((row: any, index) => {
+                prepareRow(row);
+                return (
+                  <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+                    {row.cells.map((cell: any) => (
+                      <td
+                        key={cell.id}
+                        {...cell.getCellProps()}
+                        className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
+                      >
 
-                      {cell.column.id === 'name' ? (
-                        <p>
-                          {row.original ?
-                            row.original.personal_data_field.field_name
-                            : null}
-                        </p>
-                      ) :
-                        cell.column.id === 'total' ? (
+                        {cell.column.id === 'name' ? (
                           <p>
-                            {row.original ? row.original.amount * row.original.quantity : ''}
+                            {row.original ?
+                              convertToTitleCase(row.original.personal_data_field.field_name)
+                              : null}
                           </p>
-
                         ) :
-                          cell.column.id === 'action' ? (
-                            <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
-                              src={delete_icon}
-                              onClick={() => handleSelecOrderToDelete(row.original.id)}
-                              disabled={row.original.status === 'purchased'}
-                            />
+                          cell.column.id === 'total' ? (
+                            <p>
+                              {row.original ? row.original.amount * row.original.quantity : ''}
+                            </p>
+
                           ) :
-                            cell.column.id === 'status' ? (
-                              <Button type="button"
-                                className='text-black font-normal text-base'
-                                title={row.original.status}
-                                disabled={row.original.status != 'interested' || isLoadingInterestedCompanies} onClick={async () => {
-                                  setIsLoadingInterestedCompanies(true)
-                                  await handleSelectConsent(row.original)
-                                  setIsLoadingInterestedCompanies(false)
-                                }} />
-                            ) : (
-                              cell.render('Cell')
-                            )}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+                            cell.column.id === 'action' ? (
+                              <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
+                                src={delete_icon}
+                                onClick={() => handleSelecOrderToDelete(row.original.id)}
+                                disabled={row.original.status === 'purchased'}
+                              />
+                            ) :
+                              cell.column.id === 'status' ? (
+                                <Button type="button"
+                                  className='text-black font-normal text-base'
+                                  title={row.original.status}
+                                  disabled={row.original.status != 'interested' || isLoadingInterestedCompanies} onClick={async () => {
+                                    setIsLoadingInterestedCompanies(true)
+                                    await handleSelectConsent(row.original)
+                                    setIsLoadingInterestedCompanies(false)
+                                  }} />
+                              ) : (
+                                cell.render('Cell')
+                              )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody> :
             <NoData />
           }

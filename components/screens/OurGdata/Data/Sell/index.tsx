@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic'
-import { maxWidth, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES } from '@/constants';
 import { SELLINITIALVALUES } from '@/constants/auth';
 import { SellFormSchema } from '@/schema';
 import { usePersonalData } from '@/state/myGData/hooks';
 import { useFormik } from 'formik';
 import { convertToTitleCase } from '@/lib/index';
 import { Socket } from 'socket.io-client';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { TAvailableConsentUnit, TConsentSellInfo, TSelectedConsentForIntComp, TUserConsentDeals } from '@/types';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 import { useConsentActions } from '@/hooks/useConsentActions';
@@ -18,6 +18,7 @@ import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import useSocket from '@/hooks/useSocket';
 import Skeleton from '@/components/UI/LazyLoader';
+import { STATUSORDER } from '@/constants/our_g_data';
 
 
 const ConsentSellOrders = dynamic(() => import('./ConsentSellOrders'), {
@@ -30,11 +31,14 @@ const ConsentUnitsSelectionPopup = dynamic(() => import('./ConsentUnitsSelection
   loading: () => <Skeleton />
 })
 
-function Main() {
-  const pathname = usePathname();
+interface IProps {
+  slug: string
+}
+
+function Main({ slug }: IProps) {
   const router = useRouter();
 
-  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany, getAvailableConsentUnitsToSell } = useConsentActions()
+  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany, getAvailableConsentUnitsToSell, updateBuyingConsenOffer } = useConsentActions()
   const { rData } = usePersonalData();
   const { getPortfolioStatsForConsent, isLoadingConsent } = usePortfolioStats()
 
@@ -42,7 +46,7 @@ function Main() {
   const [consentDataChanged, setConsentDataChanged] = useState(true)
   const [consentDeals, setConsentDeals] = useState<TUserConsentDeals[]>([]);
   const [consentSellInfo, setConsentSellInfo] = useState<TConsentSellInfo>()
-  const [currentConsentPrice, setCurrentConsentPrice] = useState(0);
+  const [currentConsentPrice, setCurrentConsentPrice] = useState('0');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showInterestedCompanies, setShowInterestedCompanies] = useState(false)
   const [selectedConsentForInterestedCompanies, setSelectedConsentForInterestedCompanies] = useState<TSelectedConsentForIntComp | undefined>()
@@ -52,16 +56,10 @@ function Main() {
   const [selectedAvailableConsentUnits, setSelectedAvailableConsentUnits] = useState<number[]>([])
 
 
-
-  const consentTitle = useMemo(() => {
-    const parts = pathname.split('/');
-    return convertToTitleCase(parts[parts.length - 2]);
-  }, [pathname]);
-
-
   const consent: any = useMemo(() => {
-    return rData[consentTitle];
-  }, [pathname, consentTitle, rData]);
+    const consentName = convertToTitleCase(slug)
+    return rData[consentName];
+  }, [slug, rData]);
 
   const closeModal = () => {
     setIsModalOpen(false)
@@ -117,12 +115,13 @@ function Main() {
     setFieldValue('limitPrice', consentSellInfo.available_data_count);
     if (!values.amount) return;
     const totalValue = consentSellInfo.available_data_count * Number(values.amount)
-    setFieldValue('total', totalValue);
+    setFieldValue('total', totalValue.toFixed(PRICE_DECIMAL_PLACES));
   };
 
   const handleDeleteSellOrder = useCallback(async (orderId: number) => {
     await removeUserConsentDeal(orderId)
     setDataChanged(true)
+    setConsentDataChanged(true)
   }, [])
 
   const resetInterestedCompaniesData = () => {
@@ -165,10 +164,11 @@ function Main() {
       seller_id: consent.user_consent_deal_id,
       amount: Number(consent.amount_offered),
       qunatity: selectedConsentForInterestedCompanies.quantity,
-      status: consent.status.toUpperCase(),
+      status: "COMPLETED",
     }
 
     await sellConsentToInterestedCompany(payload)
+    await updateBuyingConsenOffer(consent.id)
     setDataChanged(true)
     handleToggleShowInterestedCompanies()
   }, [selectedConsentForInterestedCompanies])
@@ -204,19 +204,17 @@ function Main() {
 
   const onConnect = useCallback((socket: Socket) => {
     socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY],
+      // interval: [TODAY, YESTERDAY],
     });
   }, []);
 
   const eventHandlers = useMemo(() => ({
     consent_averages: (data: any) => {
-      const parts = pathname.split('/')
-      const consentSlug = parts[parts.length - 2]
       if (data && data.data) {
-        const valuePrice = data.data.find((item: any) => item.field_name === consentSlug);
+        const valuePrice = data.data.find((item: any) => item.field_name === convertToTitleCase(slug).toUpperCase());
         if (!valuePrice) return
         const averagePrice = valuePrice?.average_price || 0;
-        setCurrentConsentPrice(averagePrice);
+        setCurrentConsentPrice(averagePrice.toFixed(PRICE_DECIMAL_PLACES));
         setFieldValue('amount', averagePrice);
       }
     },
@@ -227,13 +225,15 @@ function Main() {
   // update total when unit and amount changes
   useEffect(() => {
     if (!values.amount || !values.limitPrice) return
-    setFieldValue('total', Number(values.amount) * Number(values.limitPrice))
+    setFieldValue('total', (Number(values.amount) * Number(values.limitPrice)).toFixed(PRICE_DECIMAL_PLACES))
   }, [values.amount, values.limitPrice])
 
   useEffect(() => {
     if (!dataChanged) return;
     getUserConsentsDeals().then((data) => {
-      setConsentDeals(data);
+      //sort by pending orders first
+      const sortedData = data.sort((a: any, b: any) => STATUSORDER[a.status] - STATUSORDER[b.status]);
+      setConsentDeals(sortedData);
       setDataChanged(false)
     })
   }, [dataChanged]);
@@ -244,7 +244,8 @@ function Main() {
       setConsentSellInfo(data[0])
     })
     getAvailableConsentUnitsToSell(consent.id).then(data => {
-      setAvailableConsentUnits(data)
+      // console.log(data)
+      setAvailableConsentUnits(data.filter((consentUnit: any) => consentUnit.value.length > 0))
       const availableUnitsIDs = data.map((unit: any) => unit.id)
       setSelectedAvailableConsentUnits(availableUnitsIDs)
     })
@@ -257,81 +258,81 @@ function Main() {
         {consentSellInfo &&
           <>
             <h1 className="text-primary dark:text-main text-3xl font-bold font-sans mt-8 mb-7 text-center">
-            {convertToTitleCase(consentSellInfo.consent_name)}
+              {convertToTitleCase(consentSellInfo.consent_name)}
             </h1>
             <div className="flex justify-between items-center">
               <p className="text-primary dark:text-main text-lg font-bold font-sans">
                 Last Price &#40;24H&#41; :  ${currentConsentPrice}
               </p>
               <p className="text-primary dark:text-main text-lg font-bold font-sans">
-              {consentSellInfo.available_data_count}
+                {consentSellInfo.available_data_count}
               </p>
               <Button
-              className="bg-blue font-bold font-sans px-8 text-white py-2 disabled:bg-disabledBlue"
-              title="Max"
-              type="button"
-              onClick={handleMax}
-              disabled={isLoadingConsent}
-            />
-          </div>
-          <form
-            className="flex flex-col gap-5 justify-center items-center max-w-[450px] w-full mx-auto"
-            noValidate
-            onSubmit={handleSubmit}
-          >
-            <Input
-              label="Unit"
-              placeholder="0.00"
-              name="limitPrice"
-              error={(touched.limitPrice && errors.limitPrice) || (isLimitPriceInValid && limitPriceErrorMessage)}
-              value={values.limitPrice}
-              className="w-full"
-              onChange={(e) => {
-                if (/^\d*$/.test(e.target.value)) {
-                  handleChange(e)
-                }
-              }}
-              disabled={isLoadingConsent}
-            />
-            <Input
-              label="Amount ($)"
-              placeholder="0.00"
-              name="amount"
-              error={(touched.amount && errors.amount) || (isAmountIsInValid && amountErrorMessage)}
-              value={values.amount}
-              className="w-full"
-              onChange={(e) => {
-                if (/^\d*\.?\d*$/.test(e.target.value)) {
-                  handleChange(e)
-                }
-              }}
-              disabled={isLoadingConsent}
-
-            />
-            <Input
-              label="Total"
-              placeholder="0.00"
-              readOnly
-              name="total"
-              error={touched.total && errors.total}
-              value={values.total}
-              className="w-full"
-
-            />
-            <div className="flex gap-x-4 my-4 w-full justify-center items-center">
-              <Button
-                type="submit"
-                className="bg-blue w-full disabled:bg-disabledBlue"
-                title="Sell"
-                disabled={isSubmitting || isLoadingConsent}
-              />
-              <Button
+                className="bg-blue font-bold font-sans px-8 text-white py-2 disabled:bg-disabledBlue"
+                title="Max"
                 type="button"
-                className="bg-[#F5B11A] w-full disabled:bg-[#f4dca9]"
-                title="Cancel"
-                onClick={() => setIsModalOpen(true)
-                }
-                disabled={isSubmitting || isLoadingConsent}
+                onClick={handleMax}
+                disabled={isLoadingConsent}
+              />
+            </div>
+            <form
+              className="flex flex-col gap-5 justify-center items-center max-w-[450px] w-full mx-auto"
+              noValidate
+              onSubmit={handleSubmit}
+            >
+              <Input
+                label="Unit"
+                placeholder="0.00"
+                name="limitPrice"
+                error={(touched.limitPrice && errors.limitPrice) || (isLimitPriceInValid && limitPriceErrorMessage)}
+                value={values.limitPrice}
+                className="w-full"
+                onChange={(e) => {
+                  if (/^\d*$/.test(e.target.value)) {
+                    handleChange(e)
+                  }
+                }}
+                disabled={isLoadingConsent}
+              />
+              <Input
+                label="Amount ($)"
+                placeholder="0.00"
+                name="amount"
+                error={(touched.amount && errors.amount) || (isAmountIsInValid && amountErrorMessage)}
+                value={values.amount}
+                className="w-full"
+                onChange={(e) => {
+                  if (/^\d*\.?\d*$/.test(e.target.value)) {
+                    handleChange(e)
+                  }
+                }}
+                disabled={isLoadingConsent}
+
+              />
+              <Input
+                label="Total"
+                placeholder="0.00"
+                readOnly
+                name="total"
+                error={touched.total && errors.total}
+                value={values.total}
+                className="w-full"
+
+              />
+              <div className="flex gap-x-4 my-4 w-full justify-center items-center">
+                <Button
+                  type="submit"
+                  className="bg-blue w-full disabled:bg-disabledBlue"
+                  title="Sell"
+                  disabled={isSubmitting || isLoadingConsent}
+                />
+                <Button
+                  type="button"
+                  className="bg-[#F5B11A] w-full disabled:bg-[#f4dca9]"
+                  title="Cancel"
+                  onClick={() => setIsModalOpen(true)
+                  }
+                  disabled={isSubmitting || isLoadingConsent}
                 />
               </div>
             </form>
@@ -380,7 +381,6 @@ function Main() {
 }
 
 export default Main;
-
 
 
 

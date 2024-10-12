@@ -22,7 +22,7 @@ function LineChart({ data, className }: IProps) {
 
     scales: {
       x: {
-        display: false, 
+        display: false,
       },
 
       y: {

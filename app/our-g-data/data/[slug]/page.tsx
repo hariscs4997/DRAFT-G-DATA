@@ -3,7 +3,7 @@ import Container from '@/components/UI/Containers';
 import Main from '@/components/screens/OurGdata/Data/Chart';
 import { slugify } from '@/lib';
 
-export default function Consent({ params }: { params: { slug: string } }) {
+export default async function Consent({ params }: { params: { slug: string } }) {
   return (
     <Container type="main" className="p-12 mobile:p-2 rounded-r-lg">
       <Main slug={params.slug} />

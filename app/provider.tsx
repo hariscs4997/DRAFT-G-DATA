@@ -18,9 +18,9 @@ export default function Providers({ children }: IProps) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-      <AppProvider>
-        <ThemeProvider>{children}</ThemeProvider>
-      </AppProvider>
+        <AppProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AppProvider>
       </PersistGate>
     </Provider>
   );

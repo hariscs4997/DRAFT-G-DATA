@@ -112,7 +112,7 @@ export const createTableData = (arg: { tableName: string; data: PersonalDataType
   const result: Data = {};
   if (tableName === TableName.PData) {
     for (const d of data) {
-      const date = dayjs(d.created_at).format('MM-DD-YYYY HH:mm:ss');
+      const date = dayjs(d.created_at).format('MM-DD-YYYY');
       const fieldName = d.personal_data_field.field_name.toLowerCase();
       const { files } = d;
       result[date] = {

@@ -18,7 +18,7 @@ const ourGDataSlice = createSlice({
       },
     ) => ({
       ...state,
-      liveConsentData: [...state.liveConsentData, ...action.payload],
+      liveConsentData: action.payload,
     }),
     setConsentAssetsDataAction: (
       state,
@@ -27,7 +27,7 @@ const ourGDataSlice = createSlice({
       },
     ) => ({
       ...state,
-      consentAssetsData: [...state.consentAssetsData, ...action.payload],
+      consentAssetsData: action.payload,
     }),
   },
 });

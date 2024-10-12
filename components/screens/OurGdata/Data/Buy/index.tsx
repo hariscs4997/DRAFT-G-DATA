@@ -33,7 +33,7 @@ function Main() {
         user_consent_deal_id: selectedConsentId!,
         amount_offered: Number(results.amount),
       });
-      console.log('Order', response);
+      // console.log('Order', response);
       closeModal()
       onSubmit.setSubmitting(false);
     },
@@ -84,56 +84,56 @@ function Main() {
     <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
       {isLoading ?
         <Skeleton /> :
-      <table {...getTableProps()} className="w-full overflow-auto">
-        <thead>
+        <table {...getTableProps()} className="w-full overflow-auto">
+          <thead>
             {headerGroups.map((headerGroup: any, index) => (
               <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column: any) => (
-                <th
-                  {...column.getHeaderProps()}
-                  className={`border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap ${column.id === 'id' && 'hidden'}`}
-                >
-                  {column.render('Header')}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-            {rows.map((row: any, index) => {
-            prepareRow(row);
-            return (
-              <tr
-                key={index}
-                {...row.getRowProps()}
-                className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat"
-              >
-                {row.cells.map((cell: any) => (
-                  <td
-                    key={cell.id}
-                    {...cell.getCellProps()}
-                    className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
+                {headerGroup.headers.map((column: any) => (
+                  <th
+                    {...column.getHeaderProps()}
+                    className={`border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap ${column.id === 'id' && 'hidden'}`}
                   >
-                    {cell.column.id === 'buy' ? (
-                      <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
-                        src={buy_icon}
-                        onClick={() => {
-                          setSelectedConsentId(row.original.id)
-                          openModal(); 
-                        }}
-                        disabled={row.original.status === 'interested' || row.original.status === 'purchased'}
-                      />
-
-                    ) : (
-                      cell.render('Cell')
-                    )}
-                  </td>
+                    {column.render('Header')}
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row: any, index) => {
+              prepareRow(row);
+              return (
+                <tr
+                  key={index}
+                  {...row.getRowProps()}
+                  className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat"
+                >
+                  {row.cells.map((cell: any) => (
+                    <td
+                      key={cell.id}
+                      {...cell.getCellProps()}
+                      className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
+                    >
+                      {cell.column.id === 'buy' ? (
+                        <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
+                          src={buy_icon}
+                          onClick={() => {
+                            setSelectedConsentId(row.original.id)
+                            openModal();
+                          }}
+                          disabled={row.original.status === 'interested' || row.original.status === 'purchased'}
+                        />
+
+                      ) : (
+                        cell.render('Cell')
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       }
       <Modal
         isOpen={isModalOpen}

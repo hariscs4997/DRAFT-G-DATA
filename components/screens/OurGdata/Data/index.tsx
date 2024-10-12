@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { maxWidth, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES, TODAY, YESTERDAY } from '@/constants';
 import { DATATABLECOLUMNS } from '@/constants/consent';
 import useSocket from '@/hooks/useSocket';
 import { useTable } from 'react-table';
@@ -30,7 +30,7 @@ function Main() {
         setLiveConsentData(
           data.data.map((item: any) => ({
             name: capitalize(item.field_name),
-            price: `$${item.average_price}`,
+            price: `$${Number(item.average_price).toFixed(PRICE_DECIMAL_PLACES)}`,
           })).filter((item: any) => item.name != "Date"),
         );
         if (isLoading) setIsLoading(false);
@@ -39,32 +39,30 @@ function Main() {
   }), [isLoading]);
 
   const onConnect = useCallback((socket: Socket) => {
-    socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY]
-    })
+    socket.emit('consent_averages')
   }, [])
 
   useSocket('market_place', eventHandlers, onConnect);
   return (
     <div className={`overflow-auto w-full h-full max-w-[${maxWidth}]`}>
-        <table {...getTableProps()} className="w-full">
-          <thead>
-            {headerGroups.map((headerGroup: any, index) => (
-              <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column: any, index: number) => (
-                  <th
-                    key={index}
-                    {...column.getHeaderProps()}
-                    className={`border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap ${column.id === 'id' && 'hidden'
-                      }`}
-                  >
-                    {column.render('Header')}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-        {liveConsentData.length > 0 ? 
+      <table {...getTableProps()} className="w-full">
+        <thead>
+          {headerGroups.map((headerGroup: any, index) => (
+            <tr key={index} {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column: any, index: number) => (
+                <th
+                  key={index}
+                  {...column.getHeaderProps()}
+                  className={`border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap ${column.id === 'id' && 'hidden'
+                    }`}
+                >
+                  {column.render('Header')}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        {liveConsentData.length > 0 ?
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any, index) => {
               prepareRow(row);
@@ -88,9 +86,10 @@ function Main() {
 
                           />
                         </Link>
-                      ) : (
-                        cell.render('Cell')
-                      )}
+                      ) :
+                        (
+                          cell.render('Cell')
+                        )}
                     </td>
                   ))}
                 </tr>

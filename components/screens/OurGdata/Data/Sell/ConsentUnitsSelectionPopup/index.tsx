@@ -6,6 +6,7 @@ import Button from '@/components/UI/Button';
 import IconButton from '@/components/UI/IconButton';
 import { AVAILABLECONSENTUNITSCOLUMN } from '@/constants/consent';
 import Checkbox from '@/components/UI/Checkbox';
+import moment from 'moment';
 
 interface IProp {
     isOpen: boolean
@@ -35,6 +36,7 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose, availableConsentUnits, ha
             [consentId]: !prev[consentId]
         }))
     }
+
     return (
         <Modal
             isOpen={isOpen}
@@ -50,58 +52,58 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose, availableConsentUnits, ha
                     disabled={isLoading}
                 />
 
-                {availableConsentUnits && 
-                <table {...getTableProps()} className="w-full">
-                    <thead>
+                {availableConsentUnits &&
+                    <table {...getTableProps()} className="w-full">
+                        <thead>
                             {headerGroups.map((headerGroup: any, index) => (
                                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-                                {headerGroup.headers.map((column: any) => (
-                                    <th
-                                        {...column.getHeaderProps()}
-                                        className="border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap"
-                                    >
-                                        {column.render('Header')}
-                                    </th>
-                                ))}
-                            </tr>
-                        ))}
-                    </thead>
-                    <tbody {...getTableBodyProps()}>
-                            {rows.map((row: any, index) => {
-                            prepareRow(row);
-                            return (
-                                <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4] dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
-                                    {row.cells.map((cell: any) => (
-                                        <td
-                                            key={cell.id}
-                                            {...cell.getCellProps()}
-                                            className={`border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black dark:text-main font-sans font-normal text-base mobile:text-sm text-center ${selectedAvailableConsentUnits[row.original.id] && 'bg-[#bccfa6]'}`}
+                                    {headerGroup.headers.map((column: any) => (
+                                        <th
+                                            {...column.getHeaderProps()}
+                                            className="border-table dark:border-white border py-3 px-7 mobile:px-3 mobile:py-2 bg-table dark:bg-darkTable text-xl mobile:text-sm text-white font-medium font-sans whitespace-nowrap"
                                         >
-                                            {cell.column.id === 'checkbox' ?
-                                                <Checkbox
-                                                    checked={selectedAvailableConsentUnits[row.original.id]}
-                                                    onChange={() => toggleSelectedConsentUnit(row.original.id)}
-                                                    name={`consent-unit-${row.original.id}`}
-                                                    id={`consent-unit-${row.original.id}`}
-                                                    className="w-fit"
-                                                    error=''
-                                                    label=""
-                                                />
-                                                :
-                                                cell.column.id === 'name' ?
-                                                    <p>{row.original.personal_data_field.field_name}</p>
-                                                    :
-                                                    cell.column.id === 'values' ?
-                                                        <p>{row.original.value}</p>
-                                                        :
-                                                        cell.render('Cell')}
-                                        </td>
+                                            {column.render('Header')}
+                                        </th>
                                     ))}
                                 </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                            ))}
+                        </thead>
+                        <tbody {...getTableBodyProps()}>
+                            {rows.map((row: any, index) => {
+                                prepareRow(row);
+                                return (
+                                    <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4] dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+                                        {row.cells.map((cell: any) => (
+                                            <td
+                                                key={cell.id}
+                                                {...cell.getCellProps()}
+                                                className={`border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black dark:text-main font-sans font-normal text-base mobile:text-sm text-center ${selectedAvailableConsentUnits[row.original.id] && 'bg-[#bccfa6]'}`}
+                                            >
+                                                {cell.column.id === 'checkbox' ?
+                                                    <Checkbox
+                                                        checked={selectedAvailableConsentUnits[row.original.id]}
+                                                        onChange={() => toggleSelectedConsentUnit(row.original.id)}
+                                                        name={`consent-unit-${row.original.id}`}
+                                                        id={`consent-unit-${row.original.id}`}
+                                                        className="w-fit"
+                                                        error=''
+                                                        label=""
+                                                    />
+                                                    :
+                                                    cell.column.id === 'created_at' ?
+                                                        <p>{moment(row.original.created_at).format("YYYY-MM-DD hh:mm:ss")}</p>
+                                                        :
+                                                        cell.column.id === 'values' ?
+                                                            <p>{row.original.value}</p>
+                                                            :
+                                                            cell.render('Cell')}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
                 }
                 <div className="flex justify-center mt-4 gap-x-5">
                     <Button

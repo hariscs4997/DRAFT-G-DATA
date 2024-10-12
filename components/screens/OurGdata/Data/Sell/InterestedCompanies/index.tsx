@@ -5,6 +5,7 @@ import { buy_icon as sell_icon, close_icon } from '@/public/assets';
 import { INTERESTEDCOMPANYDATACOLUMNS } from '@/constants';
 import IconButton from '@/components/UI/IconButton';
 import { useTable } from 'react-table';
+import NoData from '@/components/UI/NoDataMessage';
 
 interface IProp {
   interestedCompanies: any;
@@ -20,6 +21,7 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
     columns: INTERESTEDCOMPANYDATACOLUMNS,
     data: interestedCompanies
   });
+
   return (
     <Modal
       isOpen={isShow}
@@ -36,7 +38,6 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
         <h1 className="text-2xl my-4 text-[#001F12] dark:text-white text-center">
           Interested Company
         </h1>
-        {/* <Table data={interestedCompanies} columns={INTERESTEDCOMPANYDATACOLUMNS} personalId={id} isClose={isClose} /> */}
         <table {...getTableProps()} className="w-full">
           <thead>
             {headerGroups.map((headerGroup: any) => (
@@ -54,46 +55,49 @@ function InterestedCompanies({ interestedCompanies, isShow, onClose, sellConsent
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()}>
-            {rows.map((row: any, index) => {
-              prepareRow(row);
-              return (
-                <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
-                  {row.cells.map((cell: any) => (
-                    <td
-                      key={cell.id}
-                      {...cell.getCellProps()}
-                      className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
-                    >
-                      {cell.column.id === 'name' ? (
+          {interestedCompanies.length > 0 ?
+            <tbody {...getTableBodyProps()}>
+              {rows.map((row: any, index) => {
+                prepareRow(row);
+                return (
+                  <tr key={index} {...row.getRowProps()} className="even:bg-[#d4d4d4]  dark:even:bg-[#6a6a6a] dark:odd:bg-darkChat">
+                    {row.cells.map((cell: any) => (
+                      <td
+                        key={cell.id}
+                        {...cell.getCellProps()}
+                        className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
+                      >
+                        {cell.column.id === 'name' ? (
 
-                        <p>{row.original.offered_by && (`${row.original.offered_by.first_name} ${row?.original.offered_by.last_name}`)}
-                        </p>
+                          <p>{row.original.offered_by && (`${row.original.offered_by.first_name} ${row?.original.offered_by.last_name}`)}
+                          </p>
+                        ) : cell.column.id === 'email' ? (
+                          <p>{row.original.offered_by.email}</p>
+                        ) : cell.column.id === 'amount_offered' ? (
+                          <p>{row.original.amount_offered}</p>
+                        )
+                          : cell.column.id === 'sell' ? (
 
-                      ) : cell.column.id === 'email' ? (
-
-                        <p>{row.original.offered_by.email}</p>
-
-                      ) : cell.column.id === 'sell' ? (
-
-                        <IconButton className='relative w-7 h-7 mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
-                          src={sell_icon}
-                          disabled={isTransactionLoading}
-                          onClick={async () => {
-                            setIsTransactionLoading(true)
-                            await sellConsentToCompany(row.original)
-                            setIsTransactionLoading(false)
-                          }}
-                        />
-                      ) : (
-                        cell.render('Cell')
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              )
-            })}
-          </tbody>
+                            <IconButton className='relative w-7 h-7 mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
+                              src={sell_icon}
+                              disabled={isTransactionLoading}
+                              onClick={async () => {
+                                setIsTransactionLoading(true)
+                                await sellConsentToCompany(row.original)
+                                setIsTransactionLoading(false)
+                              }}
+                            />
+                          ) : (
+                            cell.render('Cell')
+                          )}
+                      </td>
+                    ))}
+                  </tr>
+                )
+              })}
+            </tbody> :
+            <NoData message='No interested companies to show.' />
+          }
         </table>
       </div>
     </Modal>

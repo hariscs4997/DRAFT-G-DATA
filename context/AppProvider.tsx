@@ -64,9 +64,8 @@ function AppProvider({ children }: IProps) {
       const { data } = await api.get('api/user_consents_rewards');
       const rData = createTableData({ tableName: TableName.RData, data: data.data });
       setRData(rData);
-      const consentTableData = createTableData({ tableName: TableName.CData, data: data.data })
+      const consentTableData = createTableData({ tableName: TableName.CData, data: data.data });
       setCData(consentTableData);
-
     } catch (e) {
       console.log('e', e);
     }
@@ -75,7 +74,6 @@ function AppProvider({ children }: IProps) {
     try {
       if (!user || !user.accountType || user.accountType === ACCOUNTTYPE.PERSONAL) return;
       const { data } = await api.get(`api/company_consents_rewards/${user.id}/`);
- 
       const compData = createTableData({ tableName: TableName.CompData, data });
       setCompData(compData);
     } catch (e) {

@@ -4,7 +4,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import LineChart from './LineChart';
 import CandleChart from './CandleChart';
 import { DATATIMETYPE, DATATIMETYPESOPTIONS } from '@/constants/our_g_data';
-import { maxWidth, TODAY, YESTERDAY } from '@/constants';
+import { maxWidth, PRICE_DECIMAL_PLACES, TODAY, YESTERDAY } from '@/constants';
 import Select from '@/components/UI/Select';
 import { usePathname, useRouter } from 'next/navigation';
 import Button from '@/components/UI/Button';
@@ -74,9 +74,9 @@ export default function Main({ slug }: TProps) {
     socket.emit('consent_candle_chart_data', candleChartSocketPayload);
 
     socket.emit('consent_averages', {
-      interval: [TODAY, YESTERDAY],
+      // interval: [TODAY, YESTERDAY],
     });
-  }, [selectedTimeRange,interval,numOfHour]);
+  }, [selectedTimeRange, interval, numOfHour]);
 
   const eventHandlers = useMemo(() => ({
     consent_candle_chart_data: (data: any) => {
@@ -97,7 +97,7 @@ export default function Main({ slug }: TProps) {
       if (!data || !data.data || !data.data[consentKey]) return
       const consentLineChartData: TLineChartData = {
         x: data.data[consentKey].map((item: any) => (item.interval_start)),
-        y: data.data[consentKey].map((item: any) => (item.average_price))
+        y: data.data[consentKey].map((item: any) => (item.average_price.toFixed(PRICE_DECIMAL_PLACES)))
       }
       setLineChartData((prev) => ({ ...prev, ...consentLineChartData }));
       if (isLoading) setIsLoading(false)
@@ -106,7 +106,7 @@ export default function Main({ slug }: TProps) {
       if (data && data.data) {
         const selectedConsent = data.data.find((consent: any) => slugify(consent.field_name) === slug)
         if (!selectedConsent) return
-        setConsentLivePrice(selectedConsent.average_price)
+        setConsentLivePrice(selectedConsent.average_price.toFixed(PRICE_DECIMAL_PLACES))
       }
     },
   }), [slug, isLoading]);
@@ -148,9 +148,9 @@ export default function Main({ slug }: TProps) {
           chartType === 'line' ? (
             <LineChart data={lineChartData} />
           ) : (
-              <CandleChart data={candleChartData} />
+            <CandleChart data={candleChartData} />
           )}
-        </div>
+      </div>
 
       <div className="flex justify-center items-center gap-x-4">
         <Button

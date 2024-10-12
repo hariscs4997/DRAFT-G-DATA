@@ -12,3 +12,9 @@ export const DATATIMETYPESOPTIONS = [
   { label: DATATIMETYPE.FOUR_HOURS, value: DATATIMETYPE.FOUR_HOURS },
   { label: DATATIMETYPE.YEAR, value: DATATIMETYPE.YEAR },
 ];
+
+export const STATUSORDER: { [key: string]: number } = {
+  pending: 1,
+  interested: 2,
+  purchased: 3,
+};

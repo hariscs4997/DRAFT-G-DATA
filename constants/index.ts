@@ -168,5 +168,7 @@ export function transformData(data: any) {
   };
 }
 
-export const TODAY = moment().format('YYYY-MM-DD 00:00:00');
+export const TODAY = moment().format('YYYY-MM-DD 23:59:59');
 export const YESTERDAY = moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00');
+
+export const PRICE_DECIMAL_PLACES = 2;
