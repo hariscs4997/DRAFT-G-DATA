@@ -32,9 +32,9 @@ export const useMyGData = () => {
         }
         delete personal_data.photos;
         const payload = createPayload(personal_data);
-        const { data } = await api.post('api/personal_data_consents_rewards', payload);
-        const newData = createTableData({ tableName: TableName.PData, data: data.data });
-        setPersonalData(newData);
+        await api.post('api/personal_data_consents_rewards', payload);
+        //const newData = createTableData({ tableName: TableName.PData, data: data.data });
+        // setPersonalData(newData);
         await Promise.all([updateMyGData(), getAllConsentData(), getAllPersonalData()]);
       } catch (e) {
         // console.log('e :>> ', e);

@@ -25,10 +25,7 @@ const personalDataSlice = createSlice({
       },
     ) => ({
       ...state,
-      personalData: {
-        ...state.personalData,
-        ...action.payload,
-      },
+      personalData: action.payload,
     }),
     setGDataAction: (
       state,
