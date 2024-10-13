@@ -77,7 +77,7 @@ export const createPayload = (personal_data: PersonalDataSchemaType) =>
   Object.entries(personal_data).map(([key, value]) => ({
     value: typeof value === 'object' ? `${value}` : value.toString(),
     personal_data_field: {
-      field_name: key.toUpperCase(),
+      field_name: key.toUpperCase().replaceAll("_"," "),
     },
   }));
 
