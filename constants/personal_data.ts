@@ -26,11 +26,11 @@ export const PERSONALDATATABLECOLUMNS: Column<Columns>[] = [
 
   {
     Header: 'High Temperature',
-    accessor: 'high_temperature' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'high temperature' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Low Temperature',
-    accessor: 'low_temperature' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'low temperature' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Weather Type',
@@ -38,20 +38,20 @@ export const PERSONALDATATABLECOLUMNS: Column<Columns>[] = [
   },
   {
     Header: 'Emotional List',
-    accessor: 'emotional_list' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'emotional list' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Emotional Overall',
-    accessor: 'emotional_overall' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'emotional overall' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Relative Finance Status',
-    accessor: 'relative_finance_status' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'relative finance status' as keyof Columns, // accessor is the "key" in the data
   },
 
   {
     Header: 'Exercise Total Time',
-    accessor: 'exercise_time' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'exercise time' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Photos',
@@ -59,15 +59,15 @@ export const PERSONALDATATABLECOLUMNS: Column<Columns>[] = [
   },
   {
     Header: 'Health Overall',
-    accessor: 'health_overall' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'health overall' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Any Social Life',
-    accessor: 'any_social_life' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'any social life' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Social Life List',
-    accessor: 'social_life_list' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'social life list' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Weight',
@@ -75,15 +75,15 @@ export const PERSONALDATATABLECOLUMNS: Column<Columns>[] = [
   },
   {
     Header: 'Family Status',
-    accessor: 'family_status' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'family status' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Device Screen Time',
-    accessor: 'device_screen_time' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'device screen time' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Work Life Balance',
-    accessor: 'work_life_balance' as keyof Columns, // accessor is the "key" in the data
+    accessor: 'work life balance' as keyof Columns, // accessor is the "key" in the data
   },
   {
     Header: 'Journaling',
