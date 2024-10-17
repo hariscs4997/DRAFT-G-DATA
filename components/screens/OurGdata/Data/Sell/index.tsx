@@ -19,7 +19,7 @@ import Input from '@/components/UI/Input';
 import useSocket from '@/hooks/useSocket';
 import Skeleton from '@/components/UI/LazyLoader';
 import { STATUSORDER } from '@/constants/our_g_data';
-
+import { useUser } from '@/state/user/hooks';
 
 const ConsentSellOrders = dynamic(() => import('./ConsentSellOrders'), {
   loading: () => <Skeleton />
@@ -37,7 +37,7 @@ interface IProps {
 
 function Main({ slug }: IProps) {
   const router = useRouter();
-
+  const { user } = useUser()
   const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany, getAvailableConsentUnitsToSell, updateBuyingConsenOffer } = useConsentActions()
   const { rData } = usePersonalData();
   const { getPortfolioStatsForConsent, isLoadingConsent } = usePortfolioStats()
@@ -161,7 +161,7 @@ function Main({ slug }: IProps) {
     if (!selectedConsentForInterestedCompanies) return
     const payload = {
       personal_data_field_id: selectedConsentForInterestedCompanies.personalId,
-      seller_id: consent.user_consent_deal_id,
+      seller_id: user?.id,
       amount: Number(consent.amount_offered),
       qunatity: selectedConsentForInterestedCompanies.quantity,
       status: "COMPLETED",

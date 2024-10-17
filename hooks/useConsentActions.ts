@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { api } from '@/config';
 import { toast } from 'react-toastify';
 import { useLoading } from '@/state/loading/hooks';
-
 type TBuyConsentOfferPayload = {
   user_consent_deal_id: number;
   amount_offered: number;
@@ -18,7 +17,7 @@ type TSellConsentOfferPayload = {
 
 type TTransactionDetails = {
   personal_data_field_id: number;
-  seller_id: number;
+  seller_id?: string;
   amount: number;
   qunatity: number;
   status: string;
