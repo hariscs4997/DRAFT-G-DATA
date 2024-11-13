@@ -53,11 +53,7 @@ function Table({ data, isLoadingData }: IProps) {
                     >
                       {cell.column.id === 'name' ?
                         convertToTitleCase(row.original.name) :
-                        cell.column.id === 'price'
-                          ? (row.original.price).toFixed(PRICE_DECIMAL_PLACES)
-                          : cell.column.id === 'total'
-                            ? (row.original.quantity * row.original.price).toFixed(PRICE_DECIMAL_PLACES)
-                            : cell.render('Cell')
+                        cell.render('Cell')
                       }
                     </td>
                   ))}
