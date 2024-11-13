@@ -45,12 +45,12 @@ export function usePortfolioStats() {
     let totalAssetsValue = 0;
     dataConsent.forEach((consentData: any) => {
       console.log(consentData, consentData.consent_name)
-      const totalConsentData: any = parseFloat((consentData.available_data_market_value / consentData.available_data_count).toFixed(2));
+      const pricePerConsent: any = parseFloat((consentData.available_data_market_value / consentData.available_data_count).toFixed(2));
       consentAssets.push({
         name: consentData.consent_name,
-        price: consentData.available_data_market_value / consentData.available_data_count,
+        price: pricePerConsent ? pricePerConsent : 0,
         quantity: consentData.available_data_count,
-        total: totalConsentData,
+        total: consentData.available_data_market_value
       });
       totalAssetsValue += consentData.available_data_market_value;
     });
