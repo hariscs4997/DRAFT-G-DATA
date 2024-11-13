@@ -44,13 +44,14 @@ export function usePortfolioStats() {
     const consentAssets: TConsentAssetsData[] = [];
     let totalAssetsValue = 0;
     dataConsent.forEach((consentData: any) => {
+      const totalConsentData: number = parseFloat((consentData.available_data_market_value / consentData.available_data_count).toFixed(2));
       consentAssets.push({
         name: consentData.consent_name,
-        price: consentData.available_data_market_value,
+        price: consentData.available_data_market_value / consentData.available_data_count,
         quantity: consentData.available_data_count,
-        total: consentData.available_data_market_value * consentData.available_data_count,
+        total: totalConsentData,
       });
-      totalAssetsValue += consentData.available_data_market_value * consentData.available_data_count;
+      totalAssetsValue += consentData.available_data_market_value;
     });
 
     return {
