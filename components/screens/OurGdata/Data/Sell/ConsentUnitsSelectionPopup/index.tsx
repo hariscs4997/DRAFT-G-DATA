@@ -85,7 +85,6 @@ function ConsentUnitsSelectionPopup({ isOpen, onClose, availableConsentUnits, ha
                                                         onChange={() => toggleSelectedConsentUnit(row.original.id)}
                                                         name={`consent-unit-${row.original.id}`}
                                                         id={`consent-unit-${row.original.id}`}
-                                                        className="w-fit"
                                                         error=''
                                                         label=""
                                                     />
