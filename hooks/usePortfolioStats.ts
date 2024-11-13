@@ -45,10 +45,9 @@ export function usePortfolioStats() {
     let totalAssetsValue = 0;
     dataConsent.forEach((consentData: any) => {
       console.log(consentData, consentData.consent_name)
-      const pricePerConsent: any = parseFloat((consentData.available_data_market_value / consentData.available_data_count).toFixed(2));
       consentAssets.push({
         name: consentData.consent_name,
-        price: pricePerConsent ? pricePerConsent : 0,
+        price: consentData.avg_price_per_unit,
         quantity: consentData.available_data_count,
         total: consentData.available_data_market_value
       });
