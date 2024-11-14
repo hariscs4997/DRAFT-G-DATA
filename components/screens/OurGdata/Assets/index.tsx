@@ -32,11 +32,9 @@ function Main() {
 
   const eventHandlers = useMemo(() => ({
     consent_line_chart_data: (data: any) => {
-      console.log('Received data from get_line_chart_data -->', data.data);
       if (data && data.data) {
         const aggregatedData: { [key: string]: number } = {};
         data.data.map((item: any) => {
-          console.log(item)
           aggregatedData[item.date] = item.current_valuation
         })
         setLineChartData({ ...aggregatedData });

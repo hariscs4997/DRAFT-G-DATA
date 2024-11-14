@@ -3,6 +3,7 @@ import { PersonalDataSchemaType } from '@/schema';
 import { Columns, TDropdownOption } from '@/types';
 
 export const SOCIALLIFEOPTIONS: TDropdownOption[] = [
+    { label: '', value: '' },
   { label: 'Yes', value: 'yes' },
   { label: 'No', value: 'no' },
 ];

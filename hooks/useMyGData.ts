@@ -19,7 +19,7 @@ export const useMyGData = () => {
   const { personalData, setPersonalData, gData, rData, cData, screenData, compData, setCompData } = usePersonalData();
   const { getAllConsentData, gTableColumns, updateMyGData, getAllPersonalData } = useApp();
   const savePersonalData = useCallback(
-    async (personal_data: PersonalDataSchemaType) => {
+    async (personal_data: any) => {
       try {
         setIsLoading(true);
         if (personal_data.photos) {
@@ -31,7 +31,11 @@ export const useMyGData = () => {
           await api.post('api/personal_data_consents_rewards/file_upload', formData);
         }
         delete personal_data.photos;
-        const payload = createPayload(personal_data);
+        let usersData:any = {}
+         Object.keys(personal_data).map((key:any)=>{
+          if(personal_data[key]) usersData[key] = personal_data[key]
+        })
+        const payload = createPayload(usersData);
         await api.post('api/personal_data_consents_rewards', payload);
         //const newData = createTableData({ tableName: TableName.PData, data: data.data });
         // setPersonalData(newData);
