@@ -23,7 +23,6 @@ export const RESETPASSWORDFORMINITIALVALUES: ResetPasswordFormSchemaType = {
   email: '',
 };
 export const CONFIRMPASSWORDFORMINITIALVALUES: ConfirmPasswordFormSchemaType = {
-  token: '',
   password: '',
   confirm_password: '',
 };

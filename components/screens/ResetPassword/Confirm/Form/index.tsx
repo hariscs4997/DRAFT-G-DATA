@@ -1,37 +1,31 @@
+'use client'
 import React from 'react';
 import { useFormik } from 'formik';
 import { ConfirmPasswordFormSchema, ConfirmPasswordFormSchemaType } from '@/schema';
 import { CONFIRMPASSWORDFORMINITIALVALUES } from '@/constants/auth';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
+import { useSearchParams } from 'next/navigation';
 
 type TProps = {
   isLoading: boolean;
-  confirmPassword: (payload: ConfirmPasswordFormSchemaType) => void;
+  confirmPassword: (payload: any) => void;
 };
 
 function ConfirmPasswordForm({ isLoading, confirmPassword }: TProps) {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
   const { handleSubmit, handleChange, values, touched, errors } = useFormik({
     initialValues: CONFIRMPASSWORDFORMINITIALVALUES,
     validationSchema: ConfirmPasswordFormSchema,
 
     onSubmit: async (results, onSubmit) => {
-      confirmPassword(results);
+      confirmPassword({ ...results, token });
       onSubmit.setSubmitting(false);
     },
   });
   return (
     <form className="flex flex-col gap-y-5" noValidate onSubmit={handleSubmit}>
-      <Input
-        label="Token"
-        placeholder="Token"
-        type="token"
-        name="token"
-        error={touched.token && errors.token}
-        onChange={handleChange}
-        value={values.token}
-        className="w-full"
-      />
       <Input
         label="Password"
         placeholder="Password"

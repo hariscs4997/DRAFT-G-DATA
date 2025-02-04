@@ -64,7 +64,6 @@ export const ResetPasswordFormSchema = object({
 });
 
 export const ConfirmPasswordFormSchema = object({
-  token: string().required('Token cannot be empty'),
   password: string().required('Password is required'),
   confirm_password: string()
     .oneOf([ref('password'), ''], 'Password must match')
