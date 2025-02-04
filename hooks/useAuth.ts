@@ -141,7 +141,7 @@ export const useAuth = () => {
         toast.success(data.message);
         router.push(PATHS.CONFIRMPASSWORD);
       } catch (e) {
-        if (e instanceof AxiosError) toast.error(e.response?.data.error);
+        if (e instanceof AxiosError) toast.error(e.response?.data.message);
         else toast.error('Something went wrong ');
       } finally {
         setIsLoading(false);
