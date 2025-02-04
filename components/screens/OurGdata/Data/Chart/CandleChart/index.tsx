@@ -3,7 +3,8 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from '@/context/ThemeProvider';
-
+// @ts-ignore
+// eslint-disable-next-line no-continue
 const Plot = dynamic(() => import('react-plotly.js'), {
   ssr: false,
 });
