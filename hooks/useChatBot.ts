@@ -88,7 +88,7 @@ export const useChatBot = () => {
       setChats(userMessage);
       setChats(botResponseLoading);
       setIsLoading(true);
-      resetUserPrompt();
+      // resetUserPrompt();
       let chatID = activeChatID;
       if (user && !chatID) chatID = await fetchNewChatID(userPrompt.data);
       const payload = user ? { ...userPrompt, chat_id: chatID } : userPrompt;
@@ -124,7 +124,6 @@ export const useChatBot = () => {
     setIsLoading,
     userPrompt,
     setChats,
-    resetUserPrompt,
     updateChat,
     user,
     activeChatID,
