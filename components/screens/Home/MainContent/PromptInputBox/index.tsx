@@ -47,15 +47,15 @@ function PromptInputBox({ userPrompt, setUserPrompt, sendPrompt, isLoading }: TP
           value={userPrompt?.data}
           ref={textAreaRef}
           onKeyDown={handleKeyPressed}
+          placeholder='How can G-Datalabs help you today?'
           name="prompt"
           onChange={handlePromptChange}
         />
 
         <button
           type="button"
-          className={`absolute bottom-1 right-5 bg-transparent focus:shadow-none focus:outline-none ${
-            (isLoading || userPrompt.data.length === 0) && 'cursor-not-allowed'
-          }`}
+          className={`absolute bottom-1 right-5 bg-transparent focus:shadow-none focus:outline-none ${(isLoading || userPrompt.data.length === 0) && 'cursor-not-allowed'
+            }`}
           onClick={sendPrompt}
           disabled={isLoading || userPrompt.data.length === 0}
         >
