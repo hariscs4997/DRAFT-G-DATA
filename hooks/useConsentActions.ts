@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { api } from '@/config';
 import { toast } from 'react-toastify';
 import { useLoading } from '@/state/loading/hooks';
+import { AxiosError } from 'axios';
 type TBuyConsentOfferPayload = {
   user_consent_deal_id: number;
   amount_offered: number;
@@ -76,7 +77,8 @@ export const useConsentActions = () => {
       toast.success('Order Placed');
       return data;
     } catch (error) {
-      toast.error('Something went wrong');
+      if (error instanceof AxiosError) toast.error(error.response?.data?.errors?._schema[0]);
+      else toast.error('Something went wrong');
     }
   }, []);
 
@@ -90,10 +92,11 @@ export const useConsentActions = () => {
     }
   }, []);
 
-  const updateBuyingConsenOffer = useCallback(async (id: number) => {
+  const updateBuyingConsenOffer = useCallback(async (id: number, offeredById:number) => {
     try {
       const response = await api.patch(`api/deal_offer/${id}/`, {
         status: 'ACCEPTED',
+        offered_by_id: offeredById
       });
 
       if (response.status === 200) {

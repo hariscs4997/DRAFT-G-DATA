@@ -38,7 +38,7 @@ interface IProps {
 function Main({ slug }: IProps) {
   const router = useRouter();
   const { user } = useUser()
-  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, sellConsentToInterestedCompany, getAvailableConsentUnitsToSell, updateBuyingConsenOffer } = useConsentActions()
+  const { createSellConsentOffer, getUserConsentsDeals, isLoading, removeUserConsentDeal, getConsentDealsById, getAvailableConsentUnitsToSell, updateBuyingConsenOffer } = useConsentActions()
   const { rData } = usePersonalData();
   const { getPortfolioStatsForConsent, isLoadingConsent } = usePortfolioStats()
 
@@ -159,16 +159,7 @@ function Main({ slug }: IProps) {
 
   const handleSellSelectedConsent = useCallback(async (consent: any) => {
     if (!selectedConsentForInterestedCompanies) return
-    const payload = {
-      personal_data_field_id: selectedConsentForInterestedCompanies.personalId,
-      seller_id: user?.id,
-      amount: Number(consent.amount_offered),
-      qunatity: selectedConsentForInterestedCompanies.quantity,
-      status: "COMPLETED",
-    }
-
-    await sellConsentToInterestedCompany(payload)
-    await updateBuyingConsenOffer(consent.id)
+    await updateBuyingConsenOffer(consent.id, consent.offered_by_id)
     setDataChanged(true)
     handleToggleShowInterestedCompanies()
   }, [selectedConsentForInterestedCompanies])
