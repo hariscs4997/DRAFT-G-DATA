@@ -76,7 +76,7 @@ function Main() {
         id: item.id,
         name: item.personal_data_field.field_name,
         quantity: item.quantity,
-        status: item.status,
+        status: item.status === 'in_process' ? "in process" : item.status,
         total: item.quantity * parseFloat(item.amount),
       }));
       setTableData(tableData);
@@ -121,7 +121,7 @@ function Main() {
                         <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
                           src={buy_icon}
                           onClick={() => {
-                            if (row.original.status === 'purchased') {
+                            if (row.original.status === 'in process') {
                               purchaseConsentData(row.original.id)
                             }
                             else {
@@ -130,7 +130,7 @@ function Main() {
                             }
 
                           }}
-                          disabled={row.original.status === 'interested'}
+                          disabled={row.original.status === 'interested' || row.original.status === 'purchased'}
                         />
 
                       ) : (

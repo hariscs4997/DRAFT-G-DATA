@@ -43,10 +43,11 @@ export const useConsentActions = () => {
    const purchaseData = useCallback(async (id:number) => {
     try {
       setIsLoading(true);
-      await api.get(`api/deal_offer/payment_checkout_link/${id}/`);
+      const { data } = await api.get(`api/deal_offer/payment_checkout_link/${id}/`);
       setIsLoading(false);
-      toast.success('Purchase Done Successfully');
+      window.location.href = data.data.checkout_page_url
     } catch (error) {
+      setIsLoading(false);
       console.log('error :>> ', error);
     }
   }, []);
