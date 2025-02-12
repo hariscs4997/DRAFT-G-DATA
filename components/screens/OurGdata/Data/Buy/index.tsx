@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import Modal from '@/components/UI/ModalDraft';
 import { buy_icon } from 'public/assets';
 import Input from '@/components/UI/Input';
@@ -18,7 +18,7 @@ import Skeleton from '@/components/UI/LazyLoader';
 
 
 function Main() {
-  const { getCompanyConsentsDeals, createBuyConsentOffer, isLoading } = useConsentActions();
+  const { getCompanyConsentsDeals, createBuyConsentOffer, isLoading, purchaseData } = useConsentActions();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedConsentId, setSelectedConsentId] = useState<number | undefined>()
   const [tableData, setTableData] = useState<TCompanyConsentDeals[]>([]);
@@ -65,6 +65,9 @@ function Main() {
     setSelectedConsentId(undefined)
     resetForm()
   };
+  const purchaseConsentData = useCallback(async (id: any) => {
+    purchaseData(id)
+  }, [])
 
   useEffect(() => {
     getCompanyConsentsDeals().then((data) => {
@@ -118,10 +121,16 @@ function Main() {
                         <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
                           src={buy_icon}
                           onClick={() => {
-                            setSelectedConsentId(row.original.id)
-                            openModal();
+                            if (row.original.status === 'purchased') {
+                              purchaseConsentData(row.original.id)
+                            }
+                            else {
+                              setSelectedConsentId(row.original.id)
+                              openModal();
+                            }
+
                           }}
-                          disabled={row.original.status === 'interested' || row.original.status === 'purchased'}
+                          disabled={row.original.status === 'interested'}
                         />
 
                       ) : (

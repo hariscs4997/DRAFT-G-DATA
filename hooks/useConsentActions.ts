@@ -40,6 +40,17 @@ export const useConsentActions = () => {
     }
   }, []);
 
+   const purchaseData = useCallback(async (id:number) => {
+    try {
+      setIsLoading(true);
+      await api.get(`api/deal_offer/payment_checkout_link/${id}/`);
+      setIsLoading(false);
+      toast.success('Purchase Done Successfully');
+    } catch (error) {
+      console.log('error :>> ', error);
+    }
+  }, []);
+
   const getUserConsentsDeals = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -131,6 +142,7 @@ export const useConsentActions = () => {
     getConsentDealsById,
     createBuyConsentOffer,
     getCompanyConsentsDeals,
+    purchaseData,
     updateBuyingConsenOffer,
     sellConsentToInterestedCompany,
     getUserConsentsDeals,
