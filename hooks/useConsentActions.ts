@@ -91,6 +91,7 @@ export const useConsentActions = () => {
     } catch (error) {
       if (error instanceof AxiosError) toast.error(error.response?.data?.errors?._schema[0]);
       else toast.error('Something went wrong');
+      throw error
     }
   }, []);
 

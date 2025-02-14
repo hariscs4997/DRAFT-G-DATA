@@ -29,13 +29,18 @@ function Main() {
     onSubmit: async (results, onSubmit) => {
       if (isMaxAmountError) return;
       onSubmit.setSubmitting(true);
-      const response = await createBuyConsentOffer({
-        user_consent_deal_id: selectedConsentId!,
-        amount_offered: Number(results.amount),
-      });
-      // console.log('Order', response);
-      closeModal()
-      onSubmit.setSubmitting(false);
+      try {
+        const response = await createBuyConsentOffer({
+          user_consent_deal_id: selectedConsentId!,
+          amount_offered: Number(results.amount),
+        });
+        // console.log('Order', response);
+        closeModal()
+        onSubmit.setSubmitting(false);
+      }
+      catch (e) {
+        console.log('error :>> ', e);
+      }
     },
   });
 
