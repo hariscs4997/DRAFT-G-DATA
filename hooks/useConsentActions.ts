@@ -100,7 +100,9 @@ export const useConsentActions = () => {
       toast.success('Sell Updated');
       return data;
     } catch (error) {
-      toast.error('Something went wrong');
+      if (error instanceof AxiosError) toast.error(error.response?.data?.errors?._schema[0]);
+      else toast.error('Something went wrong');
+      throw error
     }
   }, []);
 

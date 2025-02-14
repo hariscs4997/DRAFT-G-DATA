@@ -100,12 +100,17 @@ function Main({ slug }: IProps) {
         consent_snapshots: selectedAvailableConsentUnits.map((id) => ({ id }))
       };
       onSubmit.setSubmitting(true)
-      await createSellConsentOffer(payload);
-      onSubmit.setSubmitting(false)
-      resetForm()
-      // fetch table data again
-      setDataChanged(true)
-      setConsentDataChanged(true)
+      try {
+        await createSellConsentOffer(payload);
+        onSubmit.setSubmitting(false)
+        resetForm()
+        // fetch table data again
+        setDataChanged(true)
+        setConsentDataChanged(true)
+      }
+      catch (e) {
+        console.log(e)
+      }
     },
   });
 
