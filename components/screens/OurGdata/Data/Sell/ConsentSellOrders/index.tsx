@@ -29,7 +29,9 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
     columns: SELLDATACOLUMNS,
-    data,
+    data: data.map((item) => {
+      return { ...item, status: item.status === 'in_process' ? "in process" : item.status }
+    }),
   });
 
 

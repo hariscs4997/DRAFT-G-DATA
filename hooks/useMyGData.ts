@@ -37,6 +37,7 @@ export const useMyGData = () => {
         })
         const payload = createPayload(usersData);
         await api.post('api/personal_data_consents_rewards', payload);
+        toast.success("Form Submitted Successfully")
         //const newData = createTableData({ tableName: TableName.PData, data: data.data });
         // setPersonalData(newData);
         await Promise.all([updateMyGData(), getAllConsentData(), getAllPersonalData()]);
