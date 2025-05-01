@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { PersonalInfoSchema } from '@/schema';
 import Input from '@/components/UI/Input';
@@ -10,7 +10,7 @@ import Button from '@/components/UI/Button';
 import { UserType } from '@/state/user/types';
 import { PERSONALINFOINITIALVALUES } from '@/constants/account';
 import { UpdateUserPayloadType } from '@/types';
-import { usePlaidAuth } from '@/hooks/usePlaidAuth';
+import { usePaymentSetup } from '@/hooks/usePaymentSetup';
 import BankInformation from './BankInformation';
 import UploadPicture from './UploadPicture';
 
@@ -23,8 +23,16 @@ type TProps = {
 function Form({ user, updateUser, isLoading }: TProps) {
   const [profile, setProfile] = useState<File | null>(null);
   const [profileUrl, setProfileUrl] = useState<string>(user.image ?? '');
-  const { getPlaidLinkToken, isLoading: isPlaidLoading } = usePlaidAuth();
+  const [accountStatus, setAccountStatus] = useState<string>('');
+  const { setupPayment, isLoading: isSetupPaymentLoading } = usePaymentSetup();
+  useEffect(() => {
+    const init = async () => {
+      const status = await setupPayment(false);
+      setAccountStatus(status)
+    };
 
+    init();
+  }, []);
   const handleProfileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -175,9 +183,9 @@ function Form({ user, updateUser, isLoading }: TProps) {
             type="button"
             className="bg-transparent uppercase disabled:bg-disabledBlue max-w-[320px] w-full border-2 border-black dark:border-white mobile:order-2 connect_btn dark:text-white dark:bg-white"
             style={{ color: 'black' }}
-            onClick={getPlaidLinkToken}
-            title={user && user.accountNo ? 'Edit bank information' : 'Connect with my bank'}
-            isLoading={isPlaidLoading}
+            onClick={() => setupPayment(true)}
+            title={accountStatus === 'complete' || accountStatus === 'pending_from_stripe' ? 'Edit bank information' : 'Connect with my bank'}
+            isLoading={isSetupPaymentLoading}
           />
           <div className="flex w-full gap-x-4 justify-end mobile:justify-between">
             <Button type="button" className="bg-chat dark:bg-darkChat max-w-[230px] w-full" title="Cancel" />
