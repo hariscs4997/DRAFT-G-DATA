@@ -36,7 +36,7 @@ function MainContent({
           className="dark:text-white text-primary font-medium mobile:text-sm"
           target="_blank"
         >
-          <span className="font-bold mobile:text-sm">ChatGPT</span> 4o
+          <span className="font-bold mobile:text-sm">ChatGPT</span> 4o-mini
         </Link>
       </div>
       {chats && (
