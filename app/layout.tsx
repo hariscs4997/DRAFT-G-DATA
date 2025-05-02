@@ -8,7 +8,7 @@ import Toast from '@/components/UI/Notification';
 import Provider from './provider';
 
 export const metadata: Metadata = {
-  title: 'G-DataLabs',
+  title: 'G-Data Labs',
   description: 'Unlocking Possibilities: The AI Tool for Seamless Innovation',
 };
 
