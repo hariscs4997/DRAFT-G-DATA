@@ -89,7 +89,7 @@ export const useConsentActions = () => {
       toast.success('Order Placed');
       return data;
     } catch (error) {
-      if (error instanceof AxiosError) toast.error(error.response?.data?.errors?._schema[0]);
+      if (error instanceof AxiosError) toast.error(error.response?.data?.message);
       else toast.error('Something went wrong');
       throw error
     }
@@ -101,7 +101,7 @@ export const useConsentActions = () => {
       toast.success('Sell Updated');
       return data;
     } catch (error) {
-      if (error instanceof AxiosError) toast.error(error.response?.data?.errors?._schema[0]);
+      if (error instanceof AxiosError) toast.error(error.response?.data?.message);
       else toast.error('Something went wrong');
       throw error
     }
