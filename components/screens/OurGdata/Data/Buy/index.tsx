@@ -14,6 +14,7 @@ import { useTable } from 'react-table';
 import { ConsentBuyFormSchema } from '@/schema';
 import { TCompanyConsentDeals } from '@/types';
 import Skeleton from '@/components/UI/LazyLoader';
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 
 
@@ -34,7 +35,7 @@ function Main() {
           user_consent_deal_id: selectedConsentId!,
           amount_offered: Number(results.amount),
         });
-        // console.log('Order', response);
+        await setCompanyConsentDeals()
         closeModal()
         onSubmit.setSubmitting(false);
       }
@@ -72,9 +73,13 @@ function Main() {
   };
   const purchaseConsentData = useCallback(async (id: any) => {
     purchaseData(id)
+    setCompanyConsentDeals()
   }, [])
 
   useEffect(() => {
+    setCompanyConsentDeals()
+  }, []);
+  const setCompanyConsentDeals = useCallback(async () => {
     getCompanyConsentsDeals().then((data) => {
       const tableData: TCompanyConsentDeals[] = data.map((item: any) => ({
         price: item.amount,
@@ -86,7 +91,7 @@ function Main() {
       }));
       setTableData(tableData);
     })
-  }, []);
+  }, [])
 
   return (
     <div className={`overflow-x-auto w-full h-full max-w-[${maxWidth}]`}>
@@ -123,8 +128,9 @@ function Main() {
                       className="border border-[#ced4da] dark:border-white py-6 px-7 mobile:p-3 text-black  dark:text-main font-sans font-normal text-base mobile:text-sm text-center"
                     >
                       {cell.column.id === 'buy' ? (
-                        <IconButton className='relative h-[25px] w-[25px] mobile:w-[15px] mobile:h-[15px] dark:invert-[1]'
-                          src={buy_icon}
+                        <Button
+                          type="submit"
+                          title={row.original.status === 'in process' ? 'Buy Now' : row.original.status === 'pending' ? 'Place Order' : 'Order Placed'}
                           onClick={() => {
                             if (row.original.status === 'in process') {
                               purchaseConsentData(row.original.id)
@@ -135,11 +141,23 @@ function Main() {
                             }
 
                           }}
+                          className="bg-[#046C98] py-2 px-6 w-full max-w-[80px] text-xs"
                           disabled={row.original.status === 'interested' || row.original.status === 'purchased'}
                         />
 
                       ) : (
-                        cell.render('Cell')
+                        cell.column.id === 'status' ? (
+                          <>
+                            <u className='capitalize' data-tooltip-id={"tooltip-" + index}>{row.original.status}</u>
+                            <ReactTooltip
+                              id={"tooltip-" + index}
+                              place="bottom"
+                              content={row.original.status === 'in process' ? 'Click on "Buy Now" to purchase the data' : row.original.status === 'interested' ? 'Waiting for buyer to show interest' : row.original.status === 'pending' ? 'If interested, click on "Place Order" to enter price of your choice' : 'Transaction Completed'}
+                            />
+                          </>
+                        ) : (
+                          cell.render('Cell')
+                        )
                       )}
                     </td>
                   ))}
