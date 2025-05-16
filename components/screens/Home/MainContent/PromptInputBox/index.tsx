@@ -6,6 +6,7 @@ import PromptResponseTypes from '@/components/screens/Home/MainContent/PromptInp
 import { TPROPTION } from '@/types';
 import { UserPrompt } from '@/state/chats/types';
 import Loader from '@/components/UI/Loader/Loader';
+import { ResponseChoice } from '@/state/chats/types';
 
 type TProps = {
   userPrompt: UserPrompt;
@@ -34,6 +35,10 @@ function PromptInputBox({ userPrompt, setUserPrompt, sendPrompt, isLoading }: TP
     if (userPrompt.data.trim().length === 0) return;
     if (key === 'Enter' && !e.shiftKey) {
       e.preventDefault(); // to prevent default behaviour of creating a new line
+      setUserPrompt({
+        data: "",
+        choice: ResponseChoice.TEXT
+      })
       sendPrompt();
     }
   };
@@ -56,7 +61,14 @@ function PromptInputBox({ userPrompt, setUserPrompt, sendPrompt, isLoading }: TP
           type="button"
           className={`absolute bottom-1 right-5 bg-transparent focus:shadow-none focus:outline-none ${(isLoading || userPrompt.data.length === 0) && 'cursor-not-allowed'
             }`}
-          onClick={sendPrompt}
+          onClick={() => {
+            sendPrompt();
+            setUserPrompt({
+              data: "",
+              choice: ResponseChoice.TEXT
+            })
+          }
+          }
           disabled={isLoading || userPrompt.data.length === 0}
         >
           {isLoading ? <Loader /> : <Image src={send} alt="send-icon" className="w-[40px] h-[40px] dark:invert" />}

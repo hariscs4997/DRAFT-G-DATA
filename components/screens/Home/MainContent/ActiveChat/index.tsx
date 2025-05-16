@@ -68,21 +68,21 @@ function ActiveChat({ chats, userProfile, isLoggedIn, giveFeedback }: TProps) {
 
   return (
     <div className="px-10 pt-10 overflow-y-auto h-[calc(100%_-_190px)] mobile:px-2 " ref={messagesRef}>
-      {chats.map((msg) => (
+      {chats.map((msg, index: number) => (
         <Chat
-          key={msg.messageID}
+          key={index}
           isLoading={msg.isLoading}
           profile={msg.isBotResponse ? profile(msg.isLoading) : userProfile}
         >
           {msg.content.text !== null &&
             msg.content.text.length > 0 &&
-            msg.messageID !== chats[chats.length - 1].messageID && (
+            index !== chats.length - 1 && (
               <div className="whitespace-pre-line">{msg.content.text}</div>
               // eslint-disable-next-line @typescript-eslint/indent
             )}
           {msg.content.text !== null &&
             msg.content.text.length > 0 &&
-            msg.messageID === chats[chats.length - 1].messageID && (
+            index === chats.length - 1 && (
               <Typed strings={[msg.content.text]} typeSpeed={30} showCursor={false} className="whitespace-pre-line" />
               // eslint-disable-next-line @typescript-eslint/indent
             )}
