@@ -126,7 +126,7 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
                                   <ReactTooltip
                                     id={"tooltip-" + index}
                                     place="bottom"
-                                    content={row.original.status === 'pending' ? 'Waiting for a buyer to show interest for this consent record' : row.original.status === 'purchased' ? 'This consent record has been sold' : row.original.status === 'in_process' ? 'Waiting for buyer to complete the order' : 'View a list of interested companies for this consent record'}
+                                    content={row.original.status === 'pending' ? 'Waiting for a buyer to show interest for this consent record' : row.original.status === 'purchased' ? 'This consent record has been sold' : row.original.status === 'in process' ? 'Waiting for buyer to complete the order' : 'View a list of interested companies for this consent record'}
                                   />
                                 </>
                               ) : (
