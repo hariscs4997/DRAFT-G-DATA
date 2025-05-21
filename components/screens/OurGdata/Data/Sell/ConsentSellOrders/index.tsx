@@ -11,6 +11,7 @@ import { TUserConsentDeals } from '@/types';
 import Skeleton from '@/components/UI/LazyLoader';
 import NoData from '@/components/UI/NoDataMessage';
 import { convertToTitleCase } from '@/lib';
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 interface IProps {
   isLoadingData: boolean;
@@ -109,14 +110,25 @@ function ConsentSellOrders({ data, isLoadingData, handleDeleteSellOrder, handleS
                               />
                             ) :
                               cell.column.id === 'status' ? (
-                                <Button type="button"
-                                  className='text-black font-normal text-base'
-                                  title={row.original.status}
-                                  disabled={row.original.status != 'interested' || isLoadingInterestedCompanies} onClick={async () => {
-                                    setIsLoadingInterestedCompanies(true)
-                                    await handleSelectConsent(row.original)
-                                    setIsLoadingInterestedCompanies(false)
-                                  }} />
+                                <>
+                                  <div
+                                    data-tooltip-id={"tooltip-" + index}
+                                  >
+                                    <Button type="button"
+                                      className='text-black font-normal text-base capitalize underline'
+                                      title={row.original.status}
+                                      disabled={row.original.status != 'interested' || isLoadingInterestedCompanies} onClick={async () => {
+                                        setIsLoadingInterestedCompanies(true)
+                                        await handleSelectConsent(row.original)
+                                        setIsLoadingInterestedCompanies(false)
+                                      }} />
+                                  </div>
+                                  <ReactTooltip
+                                    id={"tooltip-" + index}
+                                    place="bottom"
+                                    content={row.original.status === 'pending' ? 'Waiting for a buyer to show interest for this consent record' : row.original.status === 'purchased' ? 'This consent record has been sold' : row.original.status === 'in_process' ? 'Waiting for buyer to complete the order' : 'View a list of interested companies for this consent record'}
+                                  />
+                                </>
                               ) : (
                                 cell.render('Cell')
                               )}
